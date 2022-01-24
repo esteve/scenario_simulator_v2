@@ -64,7 +64,7 @@ void BehaviorTree::setupLogger()
                              BT::TimePoint timestamp, const BT::TreeNode & node,
                              BT::NodeStatus prev, BT::NodeStatus status) {
     if (status != BT::NodeStatus::IDLE) {
-      if (type_ == BT::TimestampType::ABSOLUTE) {
+      if (type_ == BT::TimestampType::absolute) {
         this->callback(timestamp.time_since_epoch(), node, prev, status);
       } else {
         this->callback(timestamp - first_timestamp_, node, prev, status);
