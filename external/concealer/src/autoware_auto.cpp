@@ -77,7 +77,7 @@ double AutowareAuto::getSteeringAngle() const
 
 double AutowareAuto::getGearSign() const
 {
-  return getVehicleStateCommand().gear == autoware_auto_msgs::msg::VehicleStateReport::GEAR_REVERSE
+  return getVehicleStateCommand().gear == autoware_auto_vehicle_msgs::msg::VehicleStateReport::GEAR_REVERSE
            ? -1.0
            : +1.0;
 }
@@ -88,9 +88,9 @@ openscenario_msgs::msg::WaypointsArray AutowareAuto::getWaypoints() const
 
   for (const auto & point : getTrajectory().points) {
     geometry_msgs::msg::Point waypoint;
-    waypoint.x = point.x;
-    waypoint.y = point.y;
-    waypoint.z = 0;
+    waypoint.x = point.pose.position.x;
+    waypoint.y = point.pose.position.y;
+    waypoint.z = point.pose.position.z;
     waypoints.waypoints.push_back(waypoint);
   }
 
@@ -126,19 +126,19 @@ autoware_vehicle_msgs::msg::VehicleCommand AutowareAuto::getVehicleCommand() con
 
   // handle gear enum remapping
   switch (vehicle_state_command.gear) {
-    case autoware_auto_msgs::msg::VehicleStateReport::GEAR_DRIVE:
+    case autoware_auto_vehicle_msgs::msg::VehicleStateReport::GEAR_DRIVE:
       vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::DRIVE;
       break;
-    case autoware_auto_msgs::msg::VehicleStateReport::GEAR_REVERSE:
+    case autoware_auto_vehicle_msgs::msg::VehicleStateReport::GEAR_REVERSE:
       vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::REVERSE;
       break;
-    case autoware_auto_msgs::msg::VehicleStateReport::GEAR_PARK:
+    case autoware_auto_vehicle_msgs::msg::VehicleStateReport::GEAR_PARK:
       vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::PARKING;
       break;
-    case autoware_auto_msgs::msg::VehicleStateReport::GEAR_LOW:
+    case autoware_auto_vehicle_msgs::msg::VehicleStateReport::GEAR_LOW:
       vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::LOW;
       break;
-    case autoware_auto_msgs::msg::VehicleStateReport::GEAR_NEUTRAL:
+    case autoware_auto_vehicle_msgs::msg::VehicleStateReport::GEAR_NEUTRAL:
       vehicle_command.shift.data = autoware_vehicle_msgs::msg::Shift::NEUTRAL;
       break;
   }

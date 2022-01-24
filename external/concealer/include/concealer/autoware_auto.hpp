@@ -15,11 +15,11 @@
 #ifndef CONCEALER__AUTOWARE_AUTO_HPP_
 #define CONCEALER__AUTOWARE_AUTO_HPP_
 
-#include <autoware_auto_msgs/msg/trajectory.hpp>
-#include <autoware_auto_msgs/msg/vehicle_control_command.hpp>
-#include <autoware_auto_msgs/msg/vehicle_kinematic_state.hpp>
-#include <autoware_auto_msgs/msg/vehicle_state_command.hpp>
-#include <autoware_auto_msgs/msg/vehicle_state_report.hpp>
+#include <autoware_auto_planning_msgs/msg/trajectory.hpp>
+#include <autoware_auto_vehicle_msgs/msg/vehicle_control_command.hpp>
+#include <autoware_auto_vehicle_msgs/msg/vehicle_kinematic_state.hpp>
+#include <autoware_auto_vehicle_msgs/msg/vehicle_state_command.hpp>
+#include <autoware_auto_vehicle_msgs/msg/vehicle_state_report.hpp>
 #include <concealer/autoware.hpp>
 #include <concealer/define_macro.hpp>
 
@@ -34,13 +34,13 @@ class AutowareAuto : public Autoware
   using GoalPose = geometry_msgs::msg::PoseStamped;
   DEFINE_PUBLISHER(GoalPose);
 
-  using VehicleControlCommand = autoware_auto_msgs::msg::VehicleControlCommand;
+  using VehicleControlCommand = autoware_auto_vehicle_msgs::msg::VehicleControlCommand;
   DEFINE_SUBSCRIPTION(VehicleControlCommand);
 
-  using VehicleStateCommand = autoware_auto_msgs::msg::VehicleStateCommand;
+  using VehicleStateCommand = autoware_auto_vehicle_msgs::msg::VehicleStateCommand;
   DEFINE_SUBSCRIPTION(VehicleStateCommand);
 
-  using VehicleStateReport = autoware_auto_msgs::msg::VehicleStateReport;
+  using VehicleStateReport = autoware_auto_vehicle_msgs::msg::VehicleStateReport;
   DEFINE_PUBLISHER(VehicleStateReport);
   decltype(auto) setVehicleStateReport()
   {
@@ -60,7 +60,7 @@ class AutowareAuto : public Autoware
     return setVehicleStateReport(report);
   }
 
-  using VehicleKinematicState = autoware_auto_msgs::msg::VehicleKinematicState;
+  using VehicleKinematicState = autoware_auto_vehicle_msgs::msg::VehicleKinematicState;
   DEFINE_PUBLISHER(VehicleKinematicState);
   decltype(auto) setVehicleKinematicState(
     const geometry_msgs::msg::Pose & pose, const geometry_msgs::msg::Twist & twist)
@@ -69,11 +69,8 @@ class AutowareAuto : public Autoware
     {
       kinematic_state.header.stamp = get_clock()->now();
       kinematic_state.header.frame_id = "map";
-      autoware_auto_msgs::msg::TrajectoryPoint state;
-      state.x = pose.position.x;
-      state.y = pose.position.y;
-      state.heading.real = pose.orientation.w;  // from motion_common package of autoware.auto
-      state.heading.imag = pose.orientation.z;  // from motion_common package of autoware.auto
+      autoware_auto_planning_msgs::msg::TrajectoryPoint state;
+      state.pose = pose;
       state.longitudinal_velocity_mps = twist.linear.x;
       state.lateral_velocity_mps = twist.linear.y;
       state.acceleration_mps2 = getVehicleControlCommand().long_accel_mps2;
@@ -99,7 +96,7 @@ class AutowareAuto : public Autoware
     return setInitialPose(initial_pose);
   }
 
-  using Trajectory = autoware_auto_msgs::msg::Trajectory;
+  using Trajectory = autoware_auto_planning_msgs::msg::Trajectory;
   DEFINE_SUBSCRIPTION(Trajectory);
 
   autoware_vehicle_msgs::msg::VehicleCommand getVehicleCommand() const override;
