@@ -55,7 +55,7 @@ geometry_msgs::Pose DetectionSensorBase::getSensorPose(
 }
 
 template <>
-void DetectionSensor<autoware_auto_perception_msgs::msg::PredictedObjects>::update(
+void DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::update(
   const double current_time, const std::vector<traffic_simulator_msgs::EntityStatus> & status,
   const rclcpp::Time & stamp, const std::vector<std::string> & lidar_detected_entity)
 {
@@ -75,14 +75,14 @@ void DetectionSensor<autoware_auto_perception_msgs::msg::PredictedObjects>::upda
     detected_objects = lidar_detected_entity;
   }
   if (current_time - last_update_stamp_ - configuration_.update_duration() >= -0.002) {
-    autoware_auto_perception_msgs::msg::PredictedObjects msg;
+    autoware_auto_perception_msgs::msg::DetectedObjects msg;
     msg.header.stamp = stamp;
     msg.header.frame_id = "map";
     last_update_stamp_ = current_time;
     for (const auto & s : status) {
       auto result = std::find(detected_objects.begin(), detected_objects.end(), s.name());
       if (result != detected_objects.end()) {
-        autoware_auto_perception_msgs::msg::PredictedObject object;
+        autoware_auto_perception_msgs::msg::DetectedObject object;
         bool is_ego = false;
         if (s.type().type() == traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_EGO) {
           is_ego = true;

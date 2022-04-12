@@ -12,16 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
-#include <geometry_msgs/msg/pose_stamped.hpp>
-#include <limits>
-#include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 #include <simple_noise_simulator/exception.hpp>
 #include <simple_noise_simulator/simple_noise_simulator.hpp>
 #include <simulation_interface/conversions.hpp>
+
+#include <geometry_msgs/msg/pose_stamped.hpp>
+
+#include <quaternion_operation/quaternion_operation.h>
+
+#include <limits>
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -29,35 +31,9 @@
 namespace simple_noise_simulator
 {
 ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
-: Node("simple_noise_simulator", options),
-  noise_sim_(),
-  server_(
-    simulation_interface::protocol, simulation_interface::HostName::ANY,
-    // std::bind(&ScenarioSimulator::initialize, this, std::placeholders::_1, std::placeholders::_2),
-    // std::bind(&ScenarioSimulator::updateFrame, this, std::placeholders::_1, std::placeholders::_2),
-    // std::bind(
-    //   &ScenarioSimulator::updateSensorFrame, this, std::placeholders::_1, std::placeholders::_2),
-    // std::bind(
-    //   &ScenarioSimulator::spawnVehicleEntity, this, std::placeholders::_1, std::placeholders::_2),
-    // std::bind(
-    //   &ScenarioSimulator::spawnPedestrianEntity, this, std::placeholders::_1,
-    //   std::placeholders::_2),
-    // std::bind(
-    //   &ScenarioSimulator::spawnMiscObjectEntity, this, std::placeholders::_1,
-    //   std::placeholders::_2),
-    // std::bind(
-    //   &ScenarioSimulator::despawnEntity, this, std::placeholders::_1, std::placeholders::_2),
-    std::bind(
-      &ScenarioSimulator::updateEntityStatus, this, std::placeholders::_1, std::placeholders::_2),
-    // std::bind(
-    //   &ScenarioSimulator::attachLidarSensor, this, std::placeholders::_1, std::placeholders::_2),
-    // std::bind(
-    //   &ScenarioSimulator::attachDetectionSensor, this, std::placeholders::_1,
-    //   std::placeholders::_2),
-    // std::bind(
-    //   &ScenarioSimulator::updateTrafficLights, this, std::placeholders::_1, std::placeholders::_2))
+: Node("simple_noise_simulator", options)
 {
-    // perception noise
+  // perception noise
   {
     std::random_device seed;
     auto & m = perception_noise_;
@@ -75,181 +51,52 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
     m.vel_delay_time_ = std::make_shared<float64_t>(twist_delay_time);
     m.lost_prob_ = std::make_shared<float64_t>(lost_probability);
 
-
     // x_stddev_ = declare_parameter("x_stddev", 0.0001);
     // y_stddev_ = declare_parameter("y_stddev", 0.0001);
   }
+
+  sub_detected_objects_with_noise_ =
+    create_subscription<autoware_auto_perception_msgs::msg::DetectedObjects>(
+      "/perception/object_recognition/detection/objects", QoS{1},
+      std::bind(&ScenarioSimulator::updateEntityStatusWithNoise, this, _1));
+  pub_detected_objects_with_noise_ = 
+     create_punlisher<autoware_auto_perception_msgs::msg::DetectedObjects(
+       "/perception/object_recognition/detection/objects", QoS{1});
+  
+  
+
 }
 
 ScenarioSimulator::~ScenarioSimulator() {}
 
-// void ScenarioSimulator::initialize(
-//   const simulation_api_schema::InitializeRequest & req,
-//   simulation_api_schema::InitializeResponse & res)
-// {
-//   initialized_ = true;
-//   realtime_factor_ = req.realtime_factor();
-//   step_time_ = req.step_time();
-//   res = simulation_api_schema::InitializeResponse();
-//   res.mutable_result()->set_success(true);
-//   res.mutable_result()->set_description("succeed to initialize simulation");
-//   ego_vehicles_ = {};
-//   vehicles_ = {};
-//   pedestrians_ = {};
-// }
-
-// void ScenarioSimulator::updateFrame(
-//   const simulation_api_schema::UpdateFrameRequest & req,
-//   simulation_api_schema::UpdateFrameResponse & res)
-// {
-//   res = simulation_api_schema::UpdateFrameResponse();
-//   if (!initialized_) {
-//     res.mutable_result()->set_description("simulator have not initialized yet.");
-//     res.mutable_result()->set_success(false);
-//     return;
-//   }
-//   current_time_ = req.current_time();
-//   builtin_interfaces::msg::Time t;
-//   simulation_interface::toMsg(req.current_ros_time(), t);
-//   current_ros_time_ = t;
-//   res.mutable_result()->set_success(true);
-//   res.mutable_result()->set_description("succeed to update frame");
-// }
-
-void ScenarioSimulator::updateEntityStatus(
-  const simulation_api_schema::UpdateEntityStatusRequest & req,
-  simulation_api_schema::UpdateEntityStatusResponse & res)
+void ScenarioSimulator::updateEntityStatusWithNoise(
+  autoware_auto_perception_msgs::msg::DetectedObject & msg)
 {
-  entity_status_ = {};
-  for (const auto proto : req.status()) {
-    entity_status_.emplace_back(proto);
-  }
-  res = simulation_api_schema::UpdateEntityStatusResponse();
-  res.mutable_result()->set_success(true);
-  res.mutable_result()->set_description("");
-}
+  pub_detected_objects_with_noise_->(msg)
+  // entity_status_ = {};
+  // for (const auto proto : req.status()) {
+  //   entity_status_.emplace_back(proto);
+  // }
+  // res = simulation_api_schema::UpdateEntityStatusResponse();
+  // res.mutable_result()->set_success(true);
+  // res.mutable_result()->set_description("");
+};
 
-void ScenarioSimulator::spawnVehicleEntity(
-  const simulation_api_schema::SpawnVehicleEntityRequest & req,
-  simulation_api_schema::SpawnVehicleEntityResponse & res)
-{
-  if (ego_vehicles_.size() != 0 && req.is_ego()) {
-    throw SimulationRuntimeError("multi ego does not support");
-  }
-  if (req.is_ego()) {
-    ego_vehicles_.emplace_back(req.parameters());
-  } else {
-    vehicles_.emplace_back(req.parameters());
-  }
-  res = simulation_api_schema::SpawnVehicleEntityResponse();
-  res.mutable_result()->set_success(true);
-  res.mutable_result()->set_description("");
-}
-
-void ScenarioSimulator::spawnPedestrianEntity(
-  const simulation_api_schema::SpawnPedestrianEntityRequest & req,
-  simulation_api_schema::SpawnPedestrianEntityResponse & res)
-{
-  pedestrians_.emplace_back(req.parameters());
-  res = simulation_api_schema::SpawnPedestrianEntityResponse();
-  res.mutable_result()->set_success(true);
-  res.mutable_result()->set_description("");
-}
-
-void ScenarioSimulator::spawnMiscObjectEntity(
-  const simulation_api_schema::SpawnMiscObjectEntityRequest & req,
-  simulation_api_schema::SpawnMiscObjectEntityResponse & res)
-{
-  misc_objects_.emplace_back(req.parameters());
-  res = simulation_api_schema::SpawnMiscObjectEntityResponse();
-  res.mutable_result()->set_success(true);
-  res.mutable_result()->set_description("");
-}
-
-void ScenarioSimulator::despawnEntity(
-  const simulation_api_schema::DespawnEntityRequest & req,
-  simulation_api_schema::DespawnEntityResponse & res)
-{
-  bool found = false;
-  res = simulation_api_schema::DespawnEntityResponse();
-  std::vector<traffic_simulator_msgs::VehicleParameters> vehicles;
-  for (const auto vehicle : vehicles_) {
-    if (vehicle.name() != req.name()) {
-      vehicles.emplace_back(vehicle);
-    } else {
-      found = true;
-    }
-  }
-  vehicles_ = vehicles;
-  std::vector<traffic_simulator_msgs::PedestrianParameters> pedestrians;
-  for (const auto pedestrian : pedestrians_) {
-    if (pedestrian.name() != req.name()) {
-      pedestrians.emplace_back(pedestrian);
-    } else {
-      found = true;
-    }
-  }
-  pedestrians_ = pedestrians;
-  std::vector<traffic_simulator_msgs::MiscObjectParameters> misc_objects;
-  for (const auto misc_object : misc_objects_) {
-    if (misc_object.name() != req.name()) {
-      misc_objects.emplace_back(misc_object);
-    } else {
-      found = true;
-    }
-  }
-  misc_objects_ = misc_objects;
-  if (found) {
-    res.mutable_result()->set_success(true);
-  } else {
-    res.mutable_result()->set_success(false);
-  }
-}
-
-// void ScenarioSimulator::attachDetectionSensor(
-//   const simulation_api_schema::AttachDetectionSensorRequest & req,
-//   simulation_api_schema::AttachDetectionSensorResponse & res)
+// void ScenarioSimulator::add_perception_noise(
+//   Odometry & odom, VelocityReport & vel, SteeringReport & steer) const
 // {
-//   noise_sim_.attachDetectionSensor(current_time_, req.configuration(), *this);
-//   res = simulation_api_schema::AttachDetectionSensorResponse();
-//   res.mutable_result()->set_success(true);
-// }
+//   auto & n = perception_noise_;
+//   odom.pose.pose.position.x += (*n.pos_dist_)(*n.rand_engine_);
+//   odom.pose.pose.position.y += (*n.pos_dist_)(*n.rand_engine_);
+//   const auto velocity_noise = (*n.vel_dist_)(*n.rand_engine_);
+//   odom.twist.twist.linear.x = velocity_noise;
+//   float32_t yaw = motion::motion_common::to_angle(odom.pose.pose.orientation);
+//   yaw += static_cast<float>((*n.rpy_dist_)(*n.rand_engine_));
+//   odom.pose.pose.orientation = motion::motion_common::from_angle(yaw);
 
-// void ScenarioSimulator::attachLidarSensor(
-//   const simulation_api_schema::AttachLidarSensorRequest & req,
-//   simulation_api_schema::AttachLidarSensorResponse & res)
-// {
-//   noise_sim_.attachLidarSensor(current_time_, req.configuration(), *this);
-//   res = simulation_api_schema::AttachLidarSensorResponse();
-//   res.mutable_result()->set_success(true);
-// }
+//   vel.longitudinal_velocity += static_cast<float32_t>(velocity_noise);
 
-// void ScenarioSimulator::updateSensorFrame(
-//   const simulation_api_schema::UpdateSensorFrameRequest & req,
-//   simulation_api_schema::UpdateSensorFrameResponse & res)
-// {
-//   constexpr double e = std::numeric_limits<double>::epsilon();
-//   if (std::abs(req.current_time() - current_time_) > e) {
-//     res.mutable_result()->set_success(false);
-//     res.mutable_result()->set_description("timestamp does not match");
-//   }
-//   builtin_interfaces::msg::Time t;
-//   simulation_interface::toMsg(req.current_ros_time(), t);
-//   current_ros_time_ = t;
-//   noise_sim_.updateSensorFrame(current_time_, current_ros_time_, entity_status_);
-//   res = simulation_api_schema::UpdateSensorFrameResponse();
-//   res.mutable_result()->set_success(true);
-// }
-
-// void ScenarioSimulator::updateTrafficLights(
-//   const simulation_api_schema::UpdateTrafficLightsRequest & req,
-//   simulation_api_schema::UpdateTrafficLightsResponse & res)
-// {
-//   // TODO: handle traffic lights in simple simulator
-//   (void)req;
-//   res = simulation_api_schema::UpdateTrafficLightsResponse();
-//   res.mutable_result()->set_success(true);
-// }
-// }  // namespace simple_noise_simulator
+//   steer.steering_tire_angle += static_cast<float32_t>((*n.steer_dist_)(*n.rand_engine_));
+}  // namespace simple_noise_simulator
 
 RCLCPP_COMPONENTS_REGISTER_NODE(simple_noise_simulator::ScenarioSimulator)

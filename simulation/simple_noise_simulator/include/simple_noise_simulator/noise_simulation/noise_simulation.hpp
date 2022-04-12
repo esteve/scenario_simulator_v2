@@ -52,7 +52,7 @@ public:
     -> void
   {
     if (configuration.architecture_type() == "awf/universe") {
-      using Message = autoware_auto_perception_msgs::msg::PredictedObjects;
+      using Message = autoware_auto_perception_msgs::msg::DetectedObjects;
       detection_noises_.push_back(std::make_unique<DetectionSensor<Message>>(
         current_simulation_time, configuration,
         node.create_publisher<Message>("/perception/object_recognition/objects", 1)));

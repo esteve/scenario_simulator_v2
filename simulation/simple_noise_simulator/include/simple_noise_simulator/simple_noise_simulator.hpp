@@ -76,9 +76,10 @@ extern "C" {
 }  // extern "C"
 #endif
 
+using autoware::common::types::bool8_t;
+using autoware::common::types::float64_t;
 namespace simple_noise_simulator
 {
-using autoware::common::types::float64_t;
 class PerceptionNoiseGenerator
 {
 public:
@@ -145,8 +146,9 @@ private:
   rclcpp::Time current_ros_time_;
   bool initialized_;
   std::vector<traffic_simulator_msgs::EntityStatus> entity_status_;
-  zeromq::MultiServer server_;
+  // zeromq::MultiServer server_;
   PerceptionNoiseGenerator perception_noise_;  //!< @brief for measurement noise
+  bool8_t add_measurement_noise_;  //!< @brief flag to add measurement noise
 };
 }  // namespace simple_noise_simulator
 
