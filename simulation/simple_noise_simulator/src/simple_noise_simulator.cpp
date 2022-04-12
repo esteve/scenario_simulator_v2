@@ -33,66 +33,88 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
   noise_sim_(),
   server_(
     simulation_interface::protocol, simulation_interface::HostName::ANY,
-    std::bind(&ScenarioSimulator::initialize, this, std::placeholders::_1, std::placeholders::_2),
-    std::bind(&ScenarioSimulator::updateFrame, this, std::placeholders::_1, std::placeholders::_2),
-    std::bind(
-      &ScenarioSimulator::updateSensorFrame, this, std::placeholders::_1, std::placeholders::_2),
-    std::bind(
-      &ScenarioSimulator::spawnVehicleEntity, this, std::placeholders::_1, std::placeholders::_2),
-    std::bind(
-      &ScenarioSimulator::spawnPedestrianEntity, this, std::placeholders::_1,
-      std::placeholders::_2),
-    std::bind(
-      &ScenarioSimulator::spawnMiscObjectEntity, this, std::placeholders::_1,
-      std::placeholders::_2),
-    std::bind(
-      &ScenarioSimulator::despawnEntity, this, std::placeholders::_1, std::placeholders::_2),
+    // std::bind(&ScenarioSimulator::initialize, this, std::placeholders::_1, std::placeholders::_2),
+    // std::bind(&ScenarioSimulator::updateFrame, this, std::placeholders::_1, std::placeholders::_2),
+    // std::bind(
+    //   &ScenarioSimulator::updateSensorFrame, this, std::placeholders::_1, std::placeholders::_2),
+    // std::bind(
+    //   &ScenarioSimulator::spawnVehicleEntity, this, std::placeholders::_1, std::placeholders::_2),
+    // std::bind(
+    //   &ScenarioSimulator::spawnPedestrianEntity, this, std::placeholders::_1,
+    //   std::placeholders::_2),
+    // std::bind(
+    //   &ScenarioSimulator::spawnMiscObjectEntity, this, std::placeholders::_1,
+    //   std::placeholders::_2),
+    // std::bind(
+    //   &ScenarioSimulator::despawnEntity, this, std::placeholders::_1, std::placeholders::_2),
     std::bind(
       &ScenarioSimulator::updateEntityStatus, this, std::placeholders::_1, std::placeholders::_2),
-    std::bind(
-      &ScenarioSimulator::attachLidarSensor, this, std::placeholders::_1, std::placeholders::_2),
-    std::bind(
-      &ScenarioSimulator::attachDetectionSensor, this, std::placeholders::_1,
-      std::placeholders::_2),
-    std::bind(
-      &ScenarioSimulator::updateTrafficLights, this, std::placeholders::_1, std::placeholders::_2))
+    // std::bind(
+    //   &ScenarioSimulator::attachLidarSensor, this, std::placeholders::_1, std::placeholders::_2),
+    // std::bind(
+    //   &ScenarioSimulator::attachDetectionSensor, this, std::placeholders::_1,
+    //   std::placeholders::_2),
+    // std::bind(
+    //   &ScenarioSimulator::updateTrafficLights, this, std::placeholders::_1, std::placeholders::_2))
 {
+    // perception noise
+  {
+    std::random_device seed;
+    auto & m = perception_noise_;
+    m.rand_engine_ = std::make_shared<std::mt19937>(seed());
+    float64_t pos_noise_stddev = declare_parameter("pos_noise_stddev", 1e-2);
+    float64_t vel_noise_stddev = declare_parameter("vel_noise_stddev", 1e-2);
+    float64_t rpy_noise_stddev = declare_parameter("rpy_noise_stddev", 1e-4);
+    float64_t pos_delay_time = declare_parameter("pos_delay_time", 0.0);
+    float64_t twist_delay_time = declare_parameter("twist_delay_time", 0.0);
+    float64_t lost_probability = declare_parameter("lost_probability", 0.0);
+    m.pos_noise_dist_ = std::make_shared<std::normal_distribution<>>(0.0, pos_noise_stddev);
+    m.vel_noise_dist_ = std::make_shared<std::normal_distribution<>>(0.0, vel_noise_stddev);
+    m.rpy_noise_dist_ = std::make_shared<std::normal_distribution<>>(0.0, rpy_noise_stddev);
+    m.pos_delay_time_ = std::make_shared<float64_t>(pos_delay_time);
+    m.vel_delay_time_ = std::make_shared<float64_t>(twist_delay_time);
+    m.lost_prob_ = std::make_shared<float64_t>(lost_probability);
+
+
+    // x_stddev_ = declare_parameter("x_stddev", 0.0001);
+    // y_stddev_ = declare_parameter("y_stddev", 0.0001);
+  }
 }
 
 ScenarioSimulator::~ScenarioSimulator() {}
 
-void ScenarioSimulator::initialize(
-  const simulation_api_schema::InitializeRequest & req,
-  simulation_api_schema::InitializeResponse & res)
-{
-  initialized_ = true;
-  realtime_factor_ = req.realtime_factor();
-  step_time_ = req.step_time();
-  res = simulation_api_schema::InitializeResponse();
-  res.mutable_result()->set_success(true);
-  res.mutable_result()->set_description("succeed to initialize simulation");
-  ego_vehicles_ = {};
-  vehicles_ = {};
-  pedestrians_ = {};
-}
+// void ScenarioSimulator::initialize(
+//   const simulation_api_schema::InitializeRequest & req,
+//   simulation_api_schema::InitializeResponse & res)
+// {
+//   initialized_ = true;
+//   realtime_factor_ = req.realtime_factor();
+//   step_time_ = req.step_time();
+//   res = simulation_api_schema::InitializeResponse();
+//   res.mutable_result()->set_success(true);
+//   res.mutable_result()->set_description("succeed to initialize simulation");
+//   ego_vehicles_ = {};
+//   vehicles_ = {};
+//   pedestrians_ = {};
+// }
 
-void ScenarioSimulator::updateFrame(
-  const simulation_api_schema::UpdateFrameRequest & req,
-  simulation_api_schema::UpdateFrameResponse & res)
-{
-  res = simulation_api_schema::UpdateFrameResponse();
-  if (!initialized_) {
-    res.mutable_result()->set_description("simulator have not initialized yet.");
-    res.mutable_result()->set_success(false);
-    return;
-  }
-  current_time_ = req.current_time();
-  builtin_interfaces::msg::Time t;
-  simulation_interface::toMsg(req.current_ros_time(), t);
-  current_ros_time_ = t;
-  res.mutable_result()->set_success(true);
-  res.mutable_result()->set_description("succeed to update frame");
-}
+// void ScenarioSimulator::updateFrame(
+//   const simulation_api_schema::UpdateFrameRequest & req,
+//   simulation_api_schema::UpdateFrameResponse & res)
+// {
+//   res = simulation_api_schema::UpdateFrameResponse();
+//   if (!initialized_) {
+//     res.mutable_result()->set_description("simulator have not initialized yet.");
+//     res.mutable_result()->set_success(false);
+//     return;
+//   }
+//   current_time_ = req.current_time();
+//   builtin_interfaces::msg::Time t;
+//   simulation_interface::toMsg(req.current_ros_time(), t);
+//   current_ros_time_ = t;
+//   res.mutable_result()->set_success(true);
+//   res.mutable_result()->set_description("succeed to update frame");
+// }
 
 void ScenarioSimulator::updateEntityStatus(
   const simulation_api_schema::UpdateEntityStatusRequest & req,
@@ -184,50 +206,50 @@ void ScenarioSimulator::despawnEntity(
   }
 }
 
-void ScenarioSimulator::attachDetectionSensor(
-  const simulation_api_schema::AttachDetectionSensorRequest & req,
-  simulation_api_schema::AttachDetectionSensorResponse & res)
-{
-  noise_sim_.attachDetectionSensor(current_time_, req.configuration(), *this);
-  res = simulation_api_schema::AttachDetectionSensorResponse();
-  res.mutable_result()->set_success(true);
-}
+// void ScenarioSimulator::attachDetectionSensor(
+//   const simulation_api_schema::AttachDetectionSensorRequest & req,
+//   simulation_api_schema::AttachDetectionSensorResponse & res)
+// {
+//   noise_sim_.attachDetectionSensor(current_time_, req.configuration(), *this);
+//   res = simulation_api_schema::AttachDetectionSensorResponse();
+//   res.mutable_result()->set_success(true);
+// }
 
-void ScenarioSimulator::attachLidarSensor(
-  const simulation_api_schema::AttachLidarSensorRequest & req,
-  simulation_api_schema::AttachLidarSensorResponse & res)
-{
-  noise_sim_.attachLidarSensor(current_time_, req.configuration(), *this);
-  res = simulation_api_schema::AttachLidarSensorResponse();
-  res.mutable_result()->set_success(true);
-}
+// void ScenarioSimulator::attachLidarSensor(
+//   const simulation_api_schema::AttachLidarSensorRequest & req,
+//   simulation_api_schema::AttachLidarSensorResponse & res)
+// {
+//   noise_sim_.attachLidarSensor(current_time_, req.configuration(), *this);
+//   res = simulation_api_schema::AttachLidarSensorResponse();
+//   res.mutable_result()->set_success(true);
+// }
 
-void ScenarioSimulator::updateSensorFrame(
-  const simulation_api_schema::UpdateSensorFrameRequest & req,
-  simulation_api_schema::UpdateSensorFrameResponse & res)
-{
-  constexpr double e = std::numeric_limits<double>::epsilon();
-  if (std::abs(req.current_time() - current_time_) > e) {
-    res.mutable_result()->set_success(false);
-    res.mutable_result()->set_description("timestamp does not match");
-  }
-  builtin_interfaces::msg::Time t;
-  simulation_interface::toMsg(req.current_ros_time(), t);
-  current_ros_time_ = t;
-  noise_sim_.updateSensorFrame(current_time_, current_ros_time_, entity_status_);
-  res = simulation_api_schema::UpdateSensorFrameResponse();
-  res.mutable_result()->set_success(true);
-}
+// void ScenarioSimulator::updateSensorFrame(
+//   const simulation_api_schema::UpdateSensorFrameRequest & req,
+//   simulation_api_schema::UpdateSensorFrameResponse & res)
+// {
+//   constexpr double e = std::numeric_limits<double>::epsilon();
+//   if (std::abs(req.current_time() - current_time_) > e) {
+//     res.mutable_result()->set_success(false);
+//     res.mutable_result()->set_description("timestamp does not match");
+//   }
+//   builtin_interfaces::msg::Time t;
+//   simulation_interface::toMsg(req.current_ros_time(), t);
+//   current_ros_time_ = t;
+//   noise_sim_.updateSensorFrame(current_time_, current_ros_time_, entity_status_);
+//   res = simulation_api_schema::UpdateSensorFrameResponse();
+//   res.mutable_result()->set_success(true);
+// }
 
-void ScenarioSimulator::updateTrafficLights(
-  const simulation_api_schema::UpdateTrafficLightsRequest & req,
-  simulation_api_schema::UpdateTrafficLightsResponse & res)
-{
-  // TODO: handle traffic lights in simple simulator
-  (void)req;
-  res = simulation_api_schema::UpdateTrafficLightsResponse();
-  res.mutable_result()->set_success(true);
-}
-}  // namespace simple_noise_simulator
+// void ScenarioSimulator::updateTrafficLights(
+//   const simulation_api_schema::UpdateTrafficLightsRequest & req,
+//   simulation_api_schema::UpdateTrafficLightsResponse & res)
+// {
+//   // TODO: handle traffic lights in simple simulator
+//   (void)req;
+//   res = simulation_api_schema::UpdateTrafficLightsResponse();
+//   res.mutable_result()->set_success(true);
+// }
+// }  // namespace simple_noise_simulator
 
 RCLCPP_COMPONENTS_REGISTER_NODE(simple_noise_simulator::ScenarioSimulator)

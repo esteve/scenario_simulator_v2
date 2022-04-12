@@ -22,6 +22,7 @@
 #include <geometry_msgs/msg/transform_stamped.hpp>
 #include <map>
 #include <memory>
+#include <common/types.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <simple_noise_simulator/noise_simulation/lidar/lidar_noise.hpp>
 #include <simple_noise_simulator/noise_simulation/lidar/raycaster.hpp>
@@ -77,6 +78,21 @@ extern "C" {
 
 namespace simple_noise_simulator
 {
+using autoware::common::types::float64_t;
+class PerceptionNoiseGenerator
+{
+public:
+  PerceptionNoiseGenerator() {}
+
+  std::shared_ptr<std::mt19937> rand_engine_;
+  std::shared_ptr<std::normal_distribution<>> pos_noise_dist_;
+  std::shared_ptr<std::normal_distribution<>> vel_noise_dist_;
+  std::shared_ptr<std::normal_distribution<>> rpy_noise_dist_;
+  std::shared_ptr<float64_t> pos_delay_time_;
+  std::shared_ptr<float64_t> vel_delay_time_;
+  std::shared_ptr<float64_t> lost_prob_;
+};
+
 class ScenarioSimulator : public rclcpp::Node
 {
 public:
@@ -130,6 +146,7 @@ private:
   bool initialized_;
   std::vector<traffic_simulator_msgs::EntityStatus> entity_status_;
   zeromq::MultiServer server_;
+  PerceptionNoiseGenerator perception_noise_;  //!< @brief for measurement noise
 };
 }  // namespace simple_noise_simulator
 
