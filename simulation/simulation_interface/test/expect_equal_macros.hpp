@@ -89,10 +89,18 @@
  * @brief Expect equal macros for traffic_simulator_msgs.
  */
 
-#define EXPECT_PERFORMANCE_EQ(MSG, PROTO)                   \
-  EXPECT_DOUBLE_EQ(MSG.vel_lim, PROTO.vel_lim());           \
-  EXPECT_DOUBLE_EQ(MSG.vel_rate_lim, PROTO.vel_rate_lim()); \
-  EXPECT_DOUBLE_EQ(MSG.max_deceleration, PROTO.max_deceleration());
+#define EXPECT_PERFORMANCE_EQ(MSG, PROTO)                                               \
+  EXPECT_DOUBLE_EQ(MSG.acceleration_time_constant, PROTO.acceleration_time_constant()); \
+  EXPECT_DOUBLE_EQ(MSG.acceleration_time_delay, PROTO.acceleration_time_delay());       \
+  EXPECT_DOUBLE_EQ(MSG.acceleration_limit, PROTO.acceleration_limit());                 \
+  EXPECT_DOUBLE_EQ(MSG.deceleration_limit, PROTO.deceleration_limit());                 \
+  EXPECT_DOUBLE_EQ(MSG.velocity_limit, PROTO.velocity_limit());                         \
+  EXPECT_DOUBLE_EQ(MSG.velocity_time_constant, PROTO.velocity_time_constant());         \
+  EXPECT_DOUBLE_EQ(MSG.velocity_time_delay, PROTO.velocity_time_delay());               \
+  EXPECT_DOUBLE_EQ(MSG.steer_limit, PROTO.steer_limit());                               \
+  EXPECT_DOUBLE_EQ(MSG.steer_rate_limit, PROTO.steer_rate_limit());                     \
+  EXPECT_DOUBLE_EQ(MSG.steer_time_constant, PROTO.steer_time_constant());               \
+  EXPECT_DOUBLE_EQ(MSG.steer_time_delay, PROTO.steer_time_delay());
 
 #define EXPECT_AXLE_EQ(MSG, PROTO)                              \
   EXPECT_DOUBLE_EQ(MSG.max_steering, PROTO.max_steering());     \

@@ -119,15 +119,15 @@ TEST(Conversion, Performance)
 {
   traffic_simulator_msgs::Performance proto;
   traffic_simulator_msgs::msg::Performance performance;
-  performance.vel_lim = 10;
-  performance.max_deceleration = 3;
+  performance.acceleration_limit = 10;
+  performance.deceleration_limit = 3;
   simulation_interface::toProto(performance, proto);
   EXPECT_PERFORMANCE_EQ(performance, proto);
-  EXPECT_DOUBLE_EQ(performance.vel_rate_lim, proto.vel_rate_lim());
-  EXPECT_DOUBLE_EQ(performance.max_deceleration, proto.max_deceleration());
-  EXPECT_DOUBLE_EQ(performance.vel_lim, proto.vel_lim());
+  EXPECT_DOUBLE_EQ(performance.acceleration_limit, proto.acceleration_limit());
+  EXPECT_DOUBLE_EQ(performance.deceleration_limit, proto.deceleration_limit());
+  EXPECT_DOUBLE_EQ(performance.velocity_limit, proto.velocity_limit());
   performance = traffic_simulator_msgs::msg::Performance();
-  EXPECT_DOUBLE_EQ(performance.vel_lim, 0);
+  EXPECT_DOUBLE_EQ(performance.acceleration_limit, 7.0);
   simulation_interface::toMsg(proto, performance);
   EXPECT_PERFORMANCE_EQ(performance, proto);
 }
@@ -203,8 +203,8 @@ TEST(Conversion, VehicleParameters)
   box.dimensions.z = 4.0;
   p.bounding_box = box;
   traffic_simulator_msgs::msg::Performance performance;
-  performance.vel_lim = 10;
-  performance.max_deceleration = 3;
+  performance.velocity_limit = 10;
+  performance.deceleration_limit = 3;
   p.performance = performance;
   traffic_simulator_msgs::msg::Axle axle;
   axle.max_steering = 30;

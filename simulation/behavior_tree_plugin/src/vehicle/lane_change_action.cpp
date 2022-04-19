@@ -195,7 +195,7 @@ BT::NodeStatus LaneChangeAction::tick()
         geometry_msgs::msg::Twist twist_new;
         twist_new.linear.x = boost::algorithm::clamp(
           entity_status.action_status.twist.linear.x + accel_new.linear.x * step_time, -10,
-          vehicle_parameters.performance.max_speed);
+          vehicle_parameters.performance.velocity_limit);
         twist_new.linear.y = 0.0;
         twist_new.linear.z = 0.0;
         twist_new.angular.x = 0.0;
