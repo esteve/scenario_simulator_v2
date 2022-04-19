@@ -117,18 +117,32 @@ void toProto(
   const traffic_simulator_msgs::msg::Performance & performance,
   traffic_simulator_msgs::Performance & proto)
 {
-  proto.set_max_acceleration(performance.max_acceleration);
-  proto.set_max_deceleration(performance.max_deceleration);
-  proto.set_vel_lim(performance.vel_lim);
+  proto.set_acceleration_time_constant(performance.acceleration_time_constant);
+  proto.set_acceleration_time_delay(performance.acceleration_time_delay);
+  proto.set_acceleration_limit(performance.acceleration_limit);
+  proto.set_deceleration_limit(performance.deceleration_limit);
+  proto.set_velocity_limit(performance.velocity_limit);
+  proto.set_velocity_time_delay(performance.velocity_time_delay);
+  proto.set_steer_limit(performance.steer_limit);
+  proto.set_steer_rate_limit(performance.steer_rate_limit);
+  proto.set_steer_time_constant(performance.steer_time_constant);
+  proto.set_steer_time_delay(performance.steer_time_delay);
 }
 
 void toMsg(
   const traffic_simulator_msgs::Performance & proto,
   traffic_simulator_msgs::msg::Performance & performance)
 {
-  performance.max_acceleration = proto.max_acceleration();
-  performance.max_deceleration = proto.max_deceleration();
-  performance.vel_lim = proto.vel_lim();
+  performance.acceleration_time_constant = proto.acceleration_time_constant();
+  performance.acceleration_time_delay = proto.acceleration_time_delay();
+  performance.acceleration_limit = proto.acceleration_limit();
+  performance.deceleration_limit = proto.deceleration_limit();
+  performance.velocity_limit = proto.velocity_limit();
+  performance.velocity_time_delay = proto.velocity_time_delay();
+  performance.steer_limit = proto.steer_limit();
+  performance.steer_rate_limit = proto.steer_rate_limit();
+  performance.steer_time_constant = proto.steer_time_constant();
+  performance.steer_time_delay = proto.steer_time_delay();
 }
 
 void toProto(const traffic_simulator_msgs::msg::Axle & axle, traffic_simulator_msgs::Axle & proto)
