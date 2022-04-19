@@ -39,7 +39,7 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
     std::random_device seed;
     auto & m = perception_noise_;
     m.rand_engine_ = std::make_shared<std::mt19937>(seed());
-    float64_t pos_noise_stddev = declare_parameter("pos_noise_stddev", 1e-2);
+    float64_t pos_noise_stddev = declare_parameter("pos_noise_stddev", 0.1);
     float64_t vel_noise_stddev = declare_parameter("vel_noise_stddev", 1e-2);
     float64_t rpy_noise_stddev = declare_parameter("rpy_noise_stddev", 1e-4);
     float64_t pos_delay_time = declare_parameter("pos_delay_time", 0.0);
@@ -58,7 +58,7 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
 
   sub_detected_objects_with_noise_ =
     create_subscription<autoware_auto_perception_msgs::msg::DetectedObjects>(
-      "/perception/object_recognition/detection/objects", rclcpp::QoS{1},
+      "/perception/object_recognition/detection/objects_without_noise", rclcpp::QoS{1},
       std::bind(&ScenarioSimulator::updateEntityStatusWithNoise, this, std::placeholders::_1));
   pub_detected_objects_with_noise_ =
      create_publisher<autoware_auto_perception_msgs::msg::DetectedObjects>(
@@ -76,12 +76,13 @@ void ScenarioSimulator::updateEntityStatusWithNoise(
 {
   detected_objects_ptr_ = msg;
 
+
   auto & n = perception_noise_;
-  for (auto & object : msg->objects) {
+  for (auto & object : detected_objects_ptr_->objects) {
+    RCLCPP_ERROR(rclcpp::get_logger("noise_simulator"), "before noise %lf", object.kinematics.pose_with_covariance.pose.position.x);
     object.kinematics.pose_with_covariance.pose.position.x += (*n.pos_noise_dist_)(*n.rand_engine_);
     object.kinematics.pose_with_covariance.pose.position.y += (*n.pos_noise_dist_)(*n.rand_engine_);
-    
-
+    RCLCPP_ERROR(rclcpp::get_logger("noise_simulator"), "after noise %lf",object.kinematics.pose_with_covariance.pose.position.x);
   }
 
 
