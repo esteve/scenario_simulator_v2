@@ -83,9 +83,19 @@ message EntityStatus {
  * Protobuf definition of traffic_simulator_msgs/msg/Performance type in ROS2.
  **/
 message Performance {
-  double vel_lim = 1;          // Max speed of the entity.
-  double vel_rate_lim = 2;     // Max acceleration of the entity.
-  double max_deceleration = 3; // Max deceleration of the entity.
+  double acceleration_time_constant = 1; // Time constant of acceleration/deceleration.
+  double acceleration_time_delay = 2;    // Time delay of acceleration/deceleration.
+  double acceleration_limit = 3;         // Max acceleration of the entity.
+  double deceleration_limit = 4;         // Max deceleration of the entity.
+
+  double velocity_limit = 5;             // Max speed of the entity.
+  double velocity_time_constant = 6;     // Time constant of the velocity.
+  double velocity_time_delay = 7;        // Time delay of the velocity.
+
+  double steer_limit = 8;                // Max steer angle.
+  double steer_rate_limit = 9;           // Max steer angle changing rate.
+  double steer_time_constant = 10;       // Time constant of the steering angle.
+  double steer_time_delay = 11;          // Time delay of the steering angle.
 }
 
 /**
