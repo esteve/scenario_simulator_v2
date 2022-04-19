@@ -33,6 +33,7 @@ namespace simple_noise_simulator
 ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
 : Node("simple_noise_simulator", options)
 {
+
   // perception noise
   {
     std::random_device seed;
@@ -57,11 +58,12 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
 
   sub_detected_objects_with_noise_ =
     create_subscription<autoware_auto_perception_msgs::msg::DetectedObjects>(
-      "/perception/object_recognition/detection/objects", QoS{1},
-      std::bind(&ScenarioSimulator::updateEntityStatusWithNoise, this, _1));
-  pub_detected_objects_with_noise_ = 
-     create_punlisher<autoware_auto_perception_msgs::msg::DetectedObjects(
-       "/perception/object_recognition/detection/objects", QoS{1});
+      "/perception/object_recognition/detection/objects", rclcpp::QoS{1},
+      std::bind(&ScenarioSimulator::updateEntityStatusWithNoise, this, std::placeholders::_1));
+  pub_detected_objects_with_noise_ =
+     create_publisher<autoware_auto_perception_msgs::msg::DetectedObjects>(
+       "/perception/object_recognition/detection/objects", rclcpp::QoS{1});
+
   
   
 
@@ -70,9 +72,38 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
 ScenarioSimulator::~ScenarioSimulator() {}
 
 void ScenarioSimulator::updateEntityStatusWithNoise(
-  autoware_auto_perception_msgs::msg::DetectedObject & msg)
+  const autoware_auto_perception_msgs::msg::DetectedObjects::SharedPtr msg)
 {
-  pub_detected_objects_with_noise_->(msg)
+  detected_objects_ptr_ = msg;
+
+  auto & n = perception_noise_;
+  for (auto & object : msg->objects) {
+    object.kinematics.pose_with_covariance.pose.position.x += (*n.pos_noise_dist_)(*n.rand_engine_);
+    object.kinematics.pose_with_covariance.pose.position.y += (*n.pos_noise_dist_)(*n.rand_engine_);
+    
+
+  }
+
+
+  // auto & n = perception_noise_;
+  // for (const auto & object : detected_objects_ptr_)
+  // {
+    
+  // }
+   
+  // odom.pose.pose.position.x += (*n.pos_dist_)(*n.rand_engine_);
+  // odom.pose.pose.position.y += (*n.pos_dist_)(*n.rand_engine_);
+  // const auto velocity_noise = (*n.vel_dist_)(*n.rand_engine_);
+  // odom.twist.twist.linear.x = velocity_noise;
+  // float32_t yaw = motion::motion_common::to_angle(odom.pose.pose.orientation);
+  // yaw += static_cast<float>((*n.rpy_dist_)(*n.rand_engine_));
+  // odom.pose.pose.orientation = motion::motion_common::from_angle(yaw);
+
+  // vel.longitudinal_velocity += static_cast<float32_t>(velocity_noise);
+
+  // steer.steering_tire_angle += static_cast<float32_t>((*n.steer_dist_)(*n.rand_engine_));
+
+  // pub_detected_objects_with_noise_->publish(detected_objects_ptr_);
   // entity_status_ = {};
   // for (const auto proto : req.status()) {
   //   entity_status_.emplace_back(proto);
@@ -80,7 +111,7 @@ void ScenarioSimulator::updateEntityStatusWithNoise(
   // res = simulation_api_schema::UpdateEntityStatusResponse();
   // res.mutable_result()->set_success(true);
   // res.mutable_result()->set_description("");
-};
+}
 
 // void ScenarioSimulator::add_perception_noise(
 //   Odometry & odom, VelocityReport & vel, SteeringReport & steer) const

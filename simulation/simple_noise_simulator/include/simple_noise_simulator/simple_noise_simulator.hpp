@@ -102,40 +102,52 @@ public:
   ~ScenarioSimulator();
 
 private:
-  SensorSimulation noise_sim_;
-  void initialize(
-    const simulation_api_schema::InitializeRequest & req,
-    simulation_api_schema::InitializeResponse & res);
-  void updateFrame(
-    const simulation_api_schema::UpdateFrameRequest & req,
-    simulation_api_schema::UpdateFrameResponse & res);
-  void updateEntityStatus(
-    const simulation_api_schema::UpdateEntityStatusRequest & req,
-    simulation_api_schema::UpdateEntityStatusResponse & res);
-  void spawnVehicleEntity(
-    const simulation_api_schema::SpawnVehicleEntityRequest & req,
-    simulation_api_schema::SpawnVehicleEntityResponse & res);
-  void spawnPedestrianEntity(
-    const simulation_api_schema::SpawnPedestrianEntityRequest & req,
-    simulation_api_schema::SpawnPedestrianEntityResponse & res);
-  void spawnMiscObjectEntity(
-    const simulation_api_schema::SpawnMiscObjectEntityRequest &,
-    simulation_api_schema::SpawnMiscObjectEntityResponse &);
-  void despawnEntity(
-    const simulation_api_schema::DespawnEntityRequest & req,
-    simulation_api_schema::DespawnEntityResponse & res);
-  void attachDetectionSensor(
-    const simulation_api_schema::AttachDetectionSensorRequest & req,
-    simulation_api_schema::AttachDetectionSensorResponse & res);
-  void attachLidarSensor(
-    const simulation_api_schema::AttachLidarSensorRequest & req,
-    simulation_api_schema::AttachLidarSensorResponse & res);
-  void updateSensorFrame(
-    const simulation_api_schema::UpdateSensorFrameRequest & req,
-    simulation_api_schema::UpdateSensorFrameResponse & res);
-  void updateTrafficLights(
-    const simulation_api_schema::UpdateTrafficLightsRequest & req,
-    simulation_api_schema::UpdateTrafficLightsResponse & res);
+
+  autoware_auto_perception_msgs::msg::DetectedObjects::SharedPtr
+    detected_objects_ptr_;
+
+  rclcpp::Subscription<autoware_auto_perception_msgs::msg::DetectedObjects>::SharedPtr
+    sub_detected_objects_with_noise_;
+  rclcpp::Publisher<autoware_auto_perception_msgs::msg::DetectedObjects>::SharedPtr
+    pub_detected_objects_with_noise_;
+
+  // NoiseSimulation noise_sim_;
+
+  void updateEntityStatusWithNoise(const
+  autoware_auto_perception_msgs::msg::DetectedObjects::SharedPtr);
+  // void initialize(
+  //   const simulation_api_schema::InitializeRequest & req,
+  //   simulation_api_schema::InitializeResponse & res);
+  // void updateFrame(
+  //   const simulation_api_schema::UpdateFrameRequest & req,
+  //   simulation_api_schema::UpdateFrameResponse & res);
+  // void updateEntityStatus(
+  //   const simulation_api_schema::UpdateEntityStatusRequest & req,
+  //   simulation_api_schema::UpdateEntityStatusResponse & res);
+  // void spawnVehicleEntity(
+  //   const simulation_api_schema::SpawnVehicleEntityRequest & req,
+  //   simulation_api_schema::SpawnVehicleEntityResponse & res);
+  // void spawnPedestrianEntity(
+  //   const simulation_api_schema::SpawnPedestrianEntityRequest & req,
+  //   simulation_api_schema::SpawnPedestrianEntityResponse & res);
+  // void spawnMiscObjectEntity(
+  //   const simulation_api_schema::SpawnMiscObjectEntityRequest &,
+  //   simulation_api_schema::SpawnMiscObjectEntityResponse &);
+  // void despawnEntity(
+  //   const simulation_api_schema::DespawnEntityRequest & req,
+  //   simulation_api_schema::DespawnEntityResponse & res);
+  // void attachDetectionSensor(
+  //   const simulation_api_schema::AttachDetectionSensorRequest & req,
+  //   simulation_api_schema::AttachDetectionSensorResponse & res);
+  // void attachLidarSensor(
+  //   const simulation_api_schema::AttachLidarSensorRequest & req,
+  //   simulation_api_schema::AttachLidarSensorResponse & res);
+  // void updateSensorFrame(
+  //   const simulation_api_schema::UpdateSensorFrameRequest & req,
+  //   simulation_api_schema::UpdateSensorFrameResponse & res);
+  // void updateTrafficLights(
+  //   const simulation_api_schema::UpdateTrafficLightsRequest & req,
+  //   simulation_api_schema::UpdateTrafficLightsResponse & res);
   std::vector<traffic_simulator_msgs::VehicleParameters> ego_vehicles_;
   std::vector<traffic_simulator_msgs::VehicleParameters> vehicles_;
   std::vector<traffic_simulator_msgs::PedestrianParameters> pedestrians_;
