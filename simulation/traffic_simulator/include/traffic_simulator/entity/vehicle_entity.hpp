@@ -60,8 +60,6 @@ public:
 
   ~VehicleEntity() override = default;
 
-  const traffic_simulator_msgs::msg::VehicleParameters parameters;
-
   void appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array) override;
 
   auto getEntityTypename() const -> const std::string & override
@@ -82,9 +80,9 @@ public:
 
   void cancelRequest() override;
 
-  const boost::optional<traffic_simulator_msgs::msg::VehicleParameters> getVehicleParameters() const
+  const traffic_simulator_msgs::msg::VehicleParameters getVehicleParameters() const
   {
-    return parameters;
+    return parameters_;
   }
 
   void setDriverModel(const traffic_simulator_msgs::msg::DriverModel & model) override
@@ -112,9 +110,14 @@ public:
     behavior_plugin_ptr_->setTrafficLightManager(traffic_light_manager_);
   }
 
+  void setVehicleParameters(const traffic_simulator_msgs::msg::VehicleParameters & parameters)
+  {
+    parameters_ = parameters;
+  }
+
   const traffic_simulator_msgs::msg::BoundingBox getBoundingBox() const override
   {
-    return parameters.bounding_box;
+    return parameters_.bounding_box;
   }
 
   void requestAssignRoute(
@@ -161,6 +164,11 @@ public:
     }
     return route_planner_ptr_->getRouteLanelets(status_->lanelet_pose, horizon);
   }
+
+private:
+  traffic_simulator_msgs::msg::VehicleParameters parameters_;
+
+public:
   const std::string plugin_name;
 
 private:

@@ -104,6 +104,12 @@ public:
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
+  auto makeSimulationModel(
+    const VehicleModelType vehicle_model_type,
+    const double step_time,  //
+    const traffic_simulator_msgs::msg::VehicleParameters & parameters)
+    -> const std::shared_ptr<SimModelInterface>;
+
   void onUpdate(double current_time, double step_time) override;
 
   auto ready() const -> bool override;

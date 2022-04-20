@@ -75,58 +75,6 @@ auto getVehicleModelType()
   }
 }
 
-auto makeSimulationModel(
-  const VehicleModelType vehicle_model_type,
-  const double step_time,  //
-  const traffic_simulator_msgs::msg::VehicleParameters & parameters)
-  -> const std::shared_ptr<SimModelInterface>
-{
-  // clang-format off
-  const auto acc_time_constant   = getParameter<double>("acc_time_constant",    parameters.performance.acceleration_time_constant);
-  const auto acc_time_delay      = getParameter<double>("acc_time_delay",       parameters.performance.acceleration_time_delay);
-  const auto steer_lim           = getParameter<double>("steer_lim",            parameters.axles.front_axle.max_steering);  // 1.0
-  const auto steer_rate_lim      = getParameter<double>("steer_rate_lim",       parameters.performance.steer_rate_limit);
-  const auto steer_time_constant = getParameter<double>("steer_time_constant",  parameters.performance.steer_time_constant);
-  const auto steer_time_delay    = getParameter<double>("steer_time_delay",     parameters.performance.steer_time_delay);
-  const auto vel_lim             = getParameter<double>("vel_lim",              parameters.performance.velocity_limit);  // 50.0
-  const auto vel_rate_lim        = getParameter<double>("vel_rate_lim",         parameters.performance.acceleration_limit);  // 7.0
-  const auto vel_time_constant   = getParameter<double>("vel_time_constant",    parameters.performance.velocity_time_constant);
-  const auto vel_time_delay      = getParameter<double>("vel_time_delay",       parameters.performance.velocity_time_delay);
-  const auto wheel_base          = getParameter<double>("wheel_base",           parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x);
-  // clang-format on
-
-
-  switch (vehicle_model_type) {
-    case VehicleModelType::DELAY_STEER_ACC:
-      return std::make_shared<SimModelDelaySteerAcc>(
-        vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, acc_time_delay,
-        acc_time_constant, steer_time_delay, steer_time_constant);
-
-    case VehicleModelType::DELAY_STEER_ACC_GEARED:
-      return std::make_shared<SimModelDelaySteerAccGeared>(
-        vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, acc_time_delay,
-        acc_time_constant, steer_time_delay, steer_time_constant);
-
-    case VehicleModelType::DELAY_STEER_VEL:
-      return std::make_shared<SimModelDelaySteerVel>(
-        vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, vel_time_delay,
-        vel_time_constant, steer_time_delay, steer_time_constant);
-
-    case VehicleModelType::IDEAL_STEER_ACC:
-      return std::make_shared<SimModelIdealSteerAcc>(wheel_base);
-
-    case VehicleModelType::IDEAL_STEER_ACC_GEARED:
-      return std::make_shared<SimModelIdealSteerAccGeared>(wheel_base);
-
-    case VehicleModelType::IDEAL_STEER_VEL:
-      return std::make_shared<SimModelIdealSteerVel>(wheel_base);
-
-    default:
-      THROW_SEMANTIC_ERROR(
-        "Unsupported vehicle_model_type ", toString(vehicle_model_type), " specified");
-  }
-}
-
 auto makeAutoware(const Configuration & configuration) -> std::unique_ptr<concealer::Autoware>
 {
   const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
@@ -300,6 +248,79 @@ auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
 auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray
 {
   return autoware->getWaypoints();
+}
+
+auto EgoEntity::makeSimulationModel(
+  const VehicleModelType vehicle_model_type,
+  const double step_time,  //
+  const traffic_simulator_msgs::msg::VehicleParameters & parameters)
+  -> const std::shared_ptr<SimModelInterface>
+{
+  // clang-format off
+  const auto acc_time_constant   = getParameter<double>("acc_time_constant",    parameters.performance.acceleration_time_constant);
+  const auto acc_time_delay      = getParameter<double>("acc_time_delay",       parameters.performance.acceleration_time_delay);
+  const auto steer_lim           = getParameter<double>("steer_lim",            parameters.axles.front_axle.max_steering);  // 1.0
+  const auto steer_rate_lim      = getParameter<double>("steer_rate_lim",       parameters.performance.steer_rate_limit);
+  const auto steer_time_constant = getParameter<double>("steer_time_constant",  parameters.performance.steer_time_constant);
+  const auto steer_time_delay    = getParameter<double>("steer_time_delay",     parameters.performance.steer_time_delay);
+  const auto vel_lim             = getParameter<double>("vel_lim",              parameters.performance.velocity_limit);  // 50.0
+  const auto vel_rate_lim        = getParameter<double>("vel_rate_lim",         parameters.performance.acceleration_limit);  // 7.0
+  const auto vel_time_constant   = getParameter<double>("vel_time_constant",    parameters.performance.velocity_time_constant);
+  const auto vel_time_delay      = getParameter<double>("vel_time_delay",       parameters.performance.velocity_time_delay);
+  const auto wheel_base          = getParameter<double>("wheel_base",           parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x);
+  // clang-format on
+
+  switch (vehicle_model_type) {
+    case VehicleModelType::DELAY_STEER_ACC:
+      return std::make_shared<SimModelDelaySteerAcc>(
+        vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, acc_time_delay,
+        acc_time_constant, steer_time_delay, steer_time_constant);
+
+    case VehicleModelType::DELAY_STEER_ACC_GEARED:
+      return std::make_shared<SimModelDelaySteerAccGeared>(
+        vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, acc_time_delay,
+        acc_time_constant, steer_time_delay, steer_time_constant);
+
+    case VehicleModelType::DELAY_STEER_VEL:
+      return std::make_shared<SimModelDelaySteerVel>(
+        vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, vel_time_delay,
+        vel_time_constant, steer_time_delay, steer_time_constant);
+
+    case VehicleModelType::IDEAL_STEER_ACC:
+      return std::make_shared<SimModelIdealSteerAcc>(wheel_base);
+
+    case VehicleModelType::IDEAL_STEER_ACC_GEARED:
+      return std::make_shared<SimModelIdealSteerAccGeared>(wheel_base);
+
+    case VehicleModelType::IDEAL_STEER_VEL:
+      return std::make_shared<SimModelIdealSteerVel>(wheel_base);
+
+    default:
+      THROW_SEMANTIC_ERROR(
+        "Unsupported vehicle_model_type ", toString(vehicle_model_type), " specified");
+  }
+
+  traffic_simulator_msgs::msg::VehicleParameters overwrote_parameters;
+  {
+    // clang-format off
+    overwrote_parameters.name                                   = parameters.name;
+    overwrote_parameters.subtype                                = parameters.subtype;
+    overwrote_parameters.bounding_box                           = parameters.bounding_box;
+    overwrote_parameters.axles                                  = parameters.axles;
+    overwrote_parameters.performance.acceleration_time_constant = parameters.performance.acceleration_time_constant;
+    overwrote_parameters.performance.acceleration_time_delay    = parameters.performance.acceleration_time_delay;
+    overwrote_parameters.performance.acceleration_limit         = parameters.performance.acceleration_limit;
+    overwrote_parameters.performance.deceleration_limit         = parameters.performance.deceleration_limit;
+    overwrote_parameters.performance.velocity_limit             = parameters.performance.velocity_limit;
+    overwrote_parameters.performance.velocity_time_constant     = parameters.performance.velocity_time_constant;
+    overwrote_parameters.performance.velocity_time_delay        = parameters.performance.velocity_time_delay;
+    overwrote_parameters.performance.steer_limit                = parameters.performance.steer_limit;
+    overwrote_parameters.performance.steer_rate_limit           = parameters.performance.steer_rate_limit;
+    overwrote_parameters.performance.steer_time_constant        = parameters.performance.steer_time_constant;
+    overwrote_parameters.performance.steer_time_delay           = parameters.performance.steer_time_delay;
+    // clang-format on
+  }
+  setVehicleParameters(overwrote_parameters);
 }
 
 void EgoEntity::onUpdate(double current_time, double step_time)

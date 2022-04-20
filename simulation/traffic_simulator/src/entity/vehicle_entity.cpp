@@ -29,7 +29,7 @@ VehicleEntity::VehicleEntity(
   const std::string & name, const traffic_simulator_msgs::msg::VehicleParameters & params,
   const std::string & plugin_name)
 : EntityBase(name, params.subtype),
-  parameters(params),
+  parameters_(params),
   plugin_name(plugin_name),
   loader_(pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(
     "traffic_simulator", "entity_behavior::BehaviorPluginBase")),
@@ -37,7 +37,7 @@ VehicleEntity::VehicleEntity(
 {
   entity_type_.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
   behavior_plugin_ptr_->configure(rclcpp::get_logger(name));
-  behavior_plugin_ptr_->setVehicleParameters(parameters);
+  behavior_plugin_ptr_->setVehicleParameters(parameters_);
   behavior_plugin_ptr_->setDebugMarker({});
   behavior_plugin_ptr_->setDriverModel(traffic_simulator_msgs::msg::DriverModel());
 }
