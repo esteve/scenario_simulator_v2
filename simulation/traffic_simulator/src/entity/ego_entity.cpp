@@ -82,18 +82,19 @@ auto makeSimulationModel(
   -> const std::shared_ptr<SimModelInterface>
 {
   // clang-format off
-  const auto acc_time_constant   = getParameter<double>("acc_time_constant",     0.1);
-  const auto acc_time_delay      = getParameter<double>("acc_time_delay",        0.1);
+  const auto acc_time_constant   = getParameter<double>("acc_time_constant",    parameters.performance.acceleration_time_constant);
+  const auto acc_time_delay      = getParameter<double>("acc_time_delay",       parameters.performance.acceleration_time_delay);
   const auto steer_lim           = getParameter<double>("steer_lim",            parameters.axles.front_axle.max_steering);  // 1.0
-  const auto steer_rate_lim      = getParameter<double>("steer_rate_lim",        5.0);
-  const auto steer_time_constant = getParameter<double>("steer_time_constant",   0.27);
-  const auto steer_time_delay    = getParameter<double>("steer_time_delay",      0.24);
+  const auto steer_rate_lim      = getParameter<double>("steer_rate_lim",       parameters.performance.steer_rate_limit);
+  const auto steer_time_constant = getParameter<double>("steer_time_constant",  parameters.performance.steer_time_constant);
+  const auto steer_time_delay    = getParameter<double>("steer_time_delay",     parameters.performance.steer_time_delay);
   const auto vel_lim             = getParameter<double>("vel_lim",              parameters.performance.velocity_limit);  // 50.0
   const auto vel_rate_lim        = getParameter<double>("vel_rate_lim",         parameters.performance.acceleration_limit);  // 7.0
-  const auto vel_time_constant   = getParameter<double>("vel_time_constant",     0.1);
-  const auto vel_time_delay      = getParameter<double>("vel_time_delay",        0.1);
+  const auto vel_time_constant   = getParameter<double>("vel_time_constant",    parameters.performance.velocity_time_constant);
+  const auto vel_time_delay      = getParameter<double>("vel_time_delay",       parameters.performance.velocity_time_delay);
   const auto wheel_base          = getParameter<double>("wheel_base",           parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x);
   // clang-format on
+
 
   switch (vehicle_model_type) {
     case VehicleModelType::DELAY_STEER_ACC:
