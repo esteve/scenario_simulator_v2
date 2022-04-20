@@ -70,6 +70,7 @@ def launch_setup(context, *args, **kwargs):
     record                  = LaunchConfiguration("record",                  default=True)
     scenario                = LaunchConfiguration("scenario",                default=Path("/dev/null"))
     sensor_model            = LaunchConfiguration("sensor_model",            default="")
+    noise_model            = LaunchConfiguration("noise_model",            default="")
     launch_noise_simulator  = LaunchConfiguration("launch_noise_simulator",  default=False)
     vehicle_model           = LaunchConfiguration("vehicle_model",           default="")
     workflow                = LaunchConfiguration("workflow",                default=Path("/dev/null"))
@@ -90,6 +91,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"record                  := {record.perform(context)}")
     print(f"scenario                := {scenario.perform(context)}")
     print(f"sensor_model            := {sensor_model.perform(context)}")
+    print(f"noise_model            := {noise_model.perform(context)}")
     print(f"vehicle_model           := {vehicle_model.perform(context)}")
     print(f"workflow                := {workflow.perform(context)}")
     print(f"sigterm_timeout         := {sigterm_timeout.perform(context)}")
@@ -105,6 +107,7 @@ def launch_setup(context, *args, **kwargs):
             {"port": port},
             {"record": record},
             {"sensor_model": sensor_model},
+            {"noise_model": noise_model},
             {"vehicle_model": vehicle_model},
         ]
 
@@ -132,7 +135,8 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("launch_noise_simulator",  default_value=launch_noise_simulator ),
         DeclareLaunchArgument("output_directory",        default_value=output_directory       ),
         DeclareLaunchArgument("scenario",                default_value=scenario               ),
-        DeclareLaunchArgument("sensor_model",            default_value=sensor_model           ),
+        DeclareLaunchArgument("sensor_model",            default_value=sensor_model            ),
+        DeclareLaunchArgument("noise_model",             default_value=noise_model           ),
         DeclareLaunchArgument("vehicle_model",           default_value=vehicle_model          ),
         DeclareLaunchArgument("workflow",                default_value=workflow               ),
         DeclareLaunchArgument("sigterm_timeout",         default_value=sigterm_timeout        ),
@@ -168,7 +172,6 @@ def launch_setup(context, *args, **kwargs):
             executable="simple_noise_simulator_node",
             namespace="simulation",
             name="simple_noise_simulator",
-            condition=IfCondition(launch_noise_simulator),
             output="screen",
             parameters=[{"port": port}],
         ),
