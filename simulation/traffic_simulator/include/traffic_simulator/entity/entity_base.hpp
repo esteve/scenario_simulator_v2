@@ -86,10 +86,9 @@ public:
     autoware_auto_control_msgs::msg::AckermannControlCommand,
     autoware_auto_vehicle_msgs::msg::GearCommand>;
 
-  /*   */ auto getVehicleParameters() const
-    -> const boost::optional<traffic_simulator_msgs::msg::VehicleParameters>
+  auto getVehicleParameters() const -> traffic_simulator_msgs::msg::VehicleParameters
   {
-    return boost::none;
+    THROW_SEMANTIC_ERROR(getEntityTypename(), " type entities do not support getVehicleParameters");
   }
 
   virtual auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray = 0;
