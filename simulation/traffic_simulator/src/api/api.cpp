@@ -75,9 +75,10 @@ bool API::spawn(
     if (configuration.standalone_mode) {
       return true;
     } else {
+      const auto overwrote_parameters = entity_manager_ptr_->getVehicleParameters(name);
       simulation_api_schema::SpawnVehicleEntityRequest req;
       simulation_api_schema::SpawnVehicleEntityResponse res;
-      simulation_interface::toProto(parameters, *req.mutable_parameters());
+      simulation_interface::toProto(overwrote_parameters, *req.mutable_parameters());
       req.mutable_parameters()->set_name(name);
       req.set_is_ego(behavior == VehicleBehavior::autoware());
       zeromq_client_.call(req, res);
