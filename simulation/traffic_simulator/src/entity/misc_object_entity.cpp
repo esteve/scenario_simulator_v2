@@ -31,9 +31,6 @@ void MiscObjectEntity::onUpdate(double, double)
     status_->action_status.accel = geometry_msgs::msg::Accel();
     status_->action_status.twist = geometry_msgs::msg::Twist();
     status_->action_status.current_action = "static";
-    status_before_update_ = status_;
-  } else {
-    status_before_update_ = status_;
   }
 }
 
