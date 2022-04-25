@@ -212,7 +212,13 @@ protected:
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> other_status_;
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> entity_type_list_;
 
+  /**
+   * @brief current linear jerk
+   */
   boost::optional<double> linear_jerk_;
+  /**
+   * @brief current stand still duration
+   */
   boost::optional<double> stand_still_duration_;
 
   visualization_msgs::msg::MarkerArray current_marker_;

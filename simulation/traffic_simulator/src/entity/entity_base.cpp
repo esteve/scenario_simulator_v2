@@ -51,7 +51,20 @@ EntityBase::EntityBase(
       }
       return false;
     },
-    [this]() {}, job::Type::STAND_STILL_DURATION, false, job::Trigger::ON_MEASURE);
+    [this]() {}, job::Type::MEASURE, false, job::Trigger::ON_MEASURE);
+  job_list_.append(
+    /**
+     * @brief Update Linear Jerk
+     */
+    [this]() {
+      if (!status_ || !status_before_update_) {
+        linear_jerk_ = boost::none;
+      } else {
+        linear_jerk_ = status_.action_status.twist.linear.x - status_before_update_.twist.linear.x;
+      }
+      return false;
+    },
+    [this]() {}, job::Type::MEASURE, false, job::Trigger::ON_MEASURE);
 }
 
 void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray & /*marker_array*/)

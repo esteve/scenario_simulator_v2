@@ -62,8 +62,6 @@ class EgoEntity : public VehicleEntity
 
   boost::optional<geometry_msgs::msg::Pose> initial_pose_;
 
-  boost::optional<double> previous_linear_velocity_, previous_angular_velocity_;
-
 public:
   explicit EgoEntity() = delete;
 
