@@ -60,7 +60,8 @@ EntityBase::EntityBase(
       if (!status_ || !status_before_update_) {
         linear_jerk_ = boost::none;
       } else {
-        linear_jerk_ = status_.action_status.twist.linear.x - status_before_update_.twist.linear.x;
+        linear_jerk_ = status_->action_status.twist.linear.x -
+                       status_before_update_->action_status.twist.linear.x;
       }
       return false;
     },

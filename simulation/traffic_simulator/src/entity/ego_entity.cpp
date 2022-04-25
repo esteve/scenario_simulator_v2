@@ -215,9 +215,11 @@ auto EgoEntity::getEntityStatus(const double time, const double step_time) const
 
   geometry_msgs::msg::Accel accel;
   {
-    if (previous_angular_velocity_ && previous_linear_velocity_) {
-      accel.linear.x = (twist.linear.x - previous_linear_velocity_.get()) / step_time;
-      accel.angular.z = (twist.angular.z - previous_angular_velocity_.get()) / step_time;
+    if (status_before_update_) {
+      accel.linear.x =
+        (twist.linear.x - status_before_update_->action_status.twist.linear.x) / step_time;
+      accel.angular.z =
+        (twist.angular.z - status_before_update_->action_status.twist.angular.x) / step_time;
     }
   }
 
