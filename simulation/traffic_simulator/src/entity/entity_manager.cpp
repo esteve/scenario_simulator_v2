@@ -457,7 +457,9 @@ void EntityManager::getGoalPoses(
 
 bool EntityManager::isEgo(const std::string & name) const
 {
-  return getEntityType(name).type == traffic_simulator_msgs::msg::EntityType::EGO;
+  using traffic_simulator_msgs::msg::EntityType;
+  return getEntityType(name).type == EntityType::EGO and
+         dynamic_cast<EgoEntity const *>(entities_.at(name).get());
 }
 
 bool EntityManager::isInLanelet(
@@ -649,8 +651,6 @@ void EntityManager::update(const double current_time, const double step_time)
   std::chrono::system_clock::time_point start, end;
   start = std::chrono::system_clock::now();
   step_time_ = step_time;
-  current_time_ = current_time;
-  configuration.verbose = true;
   if (configuration.verbose) {
     std::cout << "-------------------------- UPDATE --------------------------" << std::endl;
     std::cout << "current_time : " << current_time_ << std::endl;
