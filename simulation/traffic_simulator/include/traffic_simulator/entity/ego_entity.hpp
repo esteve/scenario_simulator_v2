@@ -139,6 +139,8 @@ public:
     const speed_change::RelativeTargetSpeed & target_speed, bool continuous) override;
 
   auto setVelocityLimit(double) -> void override;
+
+  boost::optional<double> previous_linear_velocity_, previous_angular_velocity_;
 };
 }  // namespace entity
 }  // namespace traffic_simulator
