@@ -36,9 +36,32 @@ void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray & /*mark
   return;
 }
 
+<<<<<<< HEAD
 void EntityBase::onUpdate(double, double) { status_before_update_ = status_; }
+=======
+void EntityBase::onUpdate(double, double)
+{
+  job_list_.update();
+  status_before_update_ = status_;
+}
+
+auto EntityBase::getEmergencyStateName() const -> std::string
+{
+  throw common::Error(
+    "Inquiry of emergency state is valid query to only Autoware.Universe-controlled entity.",
+    "But the target entity ", std::quoted(name.c_str()), " is not controlled by Autoware.Universe");
+}
+>>>>>>> 6e2154e0... feat: add dummy occgrid sensor
 
 boost::optional<double> EntityBase::getStandStillDuration() const { return stand_still_duration_; }
+
+auto EntityBase::getTurnIndicatorsCommandName() const -> std::string
+{
+  throw common::Error(
+    "Inquiry of turn indicators command is valid query to only Autoware.Universe-controlled "
+    "entity. But the target entity ",
+    std::quoted(name.c_str()), " is not controlled by Autoware.Universe");
+}
 
 void EntityBase::requestSpeedChange(
   const double target_speed, const speed_change::Transition transition,

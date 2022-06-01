@@ -59,6 +59,11 @@ public:
 
   virtual auto getCurrentAction() const -> const std::string = 0;
 
+<<<<<<< HEAD
+=======
+  virtual auto getEmergencyStateName() const -> std::string;
+
+>>>>>>> 6e2154e0... feat: add dummy occgrid sensor
   /*   */ auto getEntityStatusBeforeUpdate() const
     -> const boost::optional<traffic_simulator_msgs::msg::EntityStatus>
   {
@@ -78,6 +83,8 @@ public:
   /*   */ auto getStatus() const -> const traffic_simulator_msgs::msg::EntityStatus;
 
   /*   */ auto getStandStillDuration() const -> boost::optional<double>;
+
+  virtual auto getTurnIndicatorsCommandName() const -> std::string;
 
   /*   */ auto getVisibility() { return visibility_; }
 

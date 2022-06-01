@@ -173,7 +173,7 @@ auto EgoEntity::getVehicleCommand() const -> std::tuple<
 
 auto EgoEntity::getCurrentAction() const -> const std::string
 {
-  const auto state = autoware->getAutowareStateString();
+  const auto state = autoware->getAutowareStateName();
   return state.empty() ? "Launching" : state;
 }
 
@@ -187,6 +187,15 @@ auto EgoEntity::getDriverModel() const -> traffic_simulator_msgs::msg::DriverMod
   model.acceleration = 0;
   model.deceleration = 0;
   return model;
+}
+
+auto EgoEntity::getEmergencyStateName() const -> std::string
+{
+  if (const auto universe = dynamic_cast<concealer::AutowareUniverse *>(autoware.get())) {
+    return boost::lexical_cast<std::string>(universe->getEmergencyState());
+  } else {
+    return "";
+  }
 }
 
 auto EgoEntity::getEntityStatus(const double time, const double step_time) const
@@ -276,6 +285,33 @@ auto EgoEntity::getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Ob
   return boost::none;
 }
 
+<<<<<<< HEAD
+=======
+auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
+{
+  const auto universe = dynamic_cast<concealer::AutowareUniverse *>(autoware.get());
+  std::vector<std::int64_t> ids = {};
+  if (universe) {
+    const auto points = universe->getPathWithLaneId().points;
+    for (const auto point : points) {
+      std::copy(point.lane_ids.begin(), point.lane_ids.end(), std::back_inserter(ids));
+    }
+    auto result = std::unique(ids.begin(), ids.end());
+    ids.erase(result, ids.end());
+  }
+  return ids;
+}
+
+auto EgoEntity::getTurnIndicatorsCommandName() const -> std::string
+{
+  if (const auto universe = dynamic_cast<concealer::AutowareUniverse *>(autoware.get())) {
+    return boost::lexical_cast<std::string>(universe->getTurnIndicatorsCommand());
+  } else {
+    return "";
+  }
+}
+
+>>>>>>> 6e2154e0... feat: add dummy occgrid sensor
 auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray
 {
   return autoware->getWaypoints();

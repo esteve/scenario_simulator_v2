@@ -69,8 +69,50 @@ auto ScenarioObject::activateOutOfRangeMetric(const Vehicle & vehicle) const -> 
 
 auto ScenarioObject::activateSensors() -> bool
 {
+<<<<<<< HEAD
   return object_controller.isUserDefinedController() and attachLidarSensor(name) and
          attachDetectionSensor(name);
+=======
+  /*
+     NOTE: The term "controller" in OpenSCENARIO is a concept equivalent to
+     "the person driving the car. Here, Autoware is considered anthropomorphic.
+     In other words, the sensor performance of Autoware in a simulation is
+     described in ScenarioObject.ObjectController.Controller.Properties as
+     "characteristics of the person driving the car.
+  */
+  simulation_api_schema::DetectionSensorConfiguration detection_sensor_configuration;
+  {
+    detection_sensor_configuration.set_entity(name);
+    detection_sensor_configuration.set_architecture_type(
+      getParameter<std::string>("architecture_type", "awf/universe"));
+    detection_sensor_configuration.set_update_duration(0.1);
+    detection_sensor_configuration.set_range(300);
+    detection_sensor_configuration.set_filter_by_range(
+      object_controller.is<Controller>()
+        ? object_controller.as<Controller>().properties.get<Boolean>("isClairvoyant")
+        : false);
+  }
+
+  simulation_api_schema::OccupancyGridSensorConfiguration occupancy_grid_sensor_configuration;
+  {
+    occupancy_grid_sensor_configuration.set_entity(name);
+    occupancy_grid_sensor_configuration.set_architecture_type(
+      getParameter<std::string>("architecture_type", "awf/universe"));
+    occupancy_grid_sensor_configuration.set_update_duration(0.1);
+    occupancy_grid_sensor_configuration.set_resolution(0.5);
+    occupancy_grid_sensor_configuration.set_width(200);
+    occupancy_grid_sensor_configuration.set_height(200);
+    occupancy_grid_sensor_configuration.set_range(300);
+    occupancy_grid_sensor_configuration.set_filter_by_range(
+      object_controller.is<Controller>()
+        ? object_controller.as<Controller>().properties.get<Boolean>("isClairvoyant")
+        : false);
+  }
+
+  return object_controller.isUserDefinedController() and attachLidarSensor(name) and
+         attachDetectionSensor(detection_sensor_configuration) and
+         attachOccupancyGridSensor(occupancy_grid_sensor_configuration);
+>>>>>>> 6e2154e0... feat: add dummy occgrid sensor
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

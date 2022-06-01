@@ -89,6 +89,8 @@ public:
 
   auto getDriverModel() const -> traffic_simulator_msgs::msg::DriverModel override;
 
+  auto getEmergencyStateName() const -> std::string override;
+
   auto getEntityStatus(const double, const double) const
     -> const traffic_simulator_msgs::msg::EntityStatus;
 
@@ -96,6 +98,13 @@ public:
 
   auto getObstacle() -> boost::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
+<<<<<<< HEAD
+=======
+  auto getRouteLanelets() const -> std::vector<std::int64_t>;
+
+  auto getTurnIndicatorsCommandName() const -> std::string override;
+
+>>>>>>> 6e2154e0... feat: add dummy occgrid sensor
   auto getVehicleCommand() const -> std::tuple<
     autoware_auto_control_msgs::msg::AckermannControlCommand,
     autoware_auto_vehicle_msgs::msg::GearCommand> override;

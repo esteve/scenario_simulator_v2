@@ -75,6 +75,15 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
     const std::unordered_map<std::string, std::function<Object()>> dispatch{
       std::make_pair(
         "currentState", [result]() { return make<String>(evaluateCurrentState(result.str(1))); }),
+<<<<<<< HEAD
+=======
+      std::make_pair(
+        "currentEmergencyState",
+        [result]() { return make<String>(evaluateCurrentEmergencyState(result.str(1))); }),
+      std::make_pair(
+        "currentTurnIndicatorsState",
+        [result]() { return make<String>(evaluateCurrentTurnIndicatorsState(result.str(1))); }),
+>>>>>>> 6e2154e0... feat: add dummy occgrid sensor
     };
     evaluateValue = dispatch.at(result.str(2));  // XXX catch
   } else if (std::regex_match(name, result, std::regex(R"(^(?:\/[\w-]+)*\/([\w]+)$)"))) {

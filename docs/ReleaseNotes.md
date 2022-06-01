@@ -2,6 +2,60 @@
 
 ## Difference between the latest release and master
 
+<<<<<<< HEAD
+=======
+Major Changes :race_car: :red_car: :blue_car:
+
+| Feature                                  | Brief summary                                                                             | Category                    | Pull request                                                     | Contributor                      |
+|------------------------------------------|-------------------------------------------------------------------------------------------|-----------------------------|------------------------------------------------------------------|----------------------------------|
+| OpenSCENARIO `UserDefinedValueCondition`  | Add condition to determine the state of the turn indicators. (unique to Autoware.Universe) | `openscenario_interpreter`  | [#777](https://github.com/tier4/scenario_simulator_v2/pull/777)  | [HansRobo](https://github.com/HansRobo) |
+| OpenSCENARIO `UserDefinedValueCondition` | Add condition to determine the emergency state of the Autoware.Universe                     | `openscenario_interpreter` | [#760](https://github.com/tier4/scenario_simulator_v2/pull/760)  | [HansRobo](https://github.com/HansRobo) |
+
+Bug Fixes:bug:
+
+| Feature | Brief summary | Category | Pull request | Contributor |
+| ------- | ------------- | -------- | ------------ | ----------- |
+|         |               |          |              |             |
+
+Minor Tweaks :oncoming_police_car:
+
+| Feature | Brief summary | Category | Pull request | Contributor |
+| ------- | ------------- | -------- | ------------ | ----------- |
+|         |               |          |              |             |
+
+## Version 0.6.4
+
+Major Changes :race_car: :red_car: :blue_car:
+
+| Feature                                       | Brief summary                                                                                                                                                            | Category                                                          | Pull request                                                    | Contributor                                   |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- | --------------------------------------------------------------- | --------------------------------------------- |
+| Entity label publisher                        | Enable specify and publish NPC semantic information such as `MOTORCYCLE`, `TRUCK`, `BUS`.                                                                                | `traffic_simulator`                                               | [#726](https://github.com/tier4/scenario_simulator_v2/pull/726) | [hakuturu583](https://github.com/hakuturu583) |
+| ROS2 Launch XML-like substitution syntax      | Add new substitution syntax `$(ros2 <argument>...)`.                                                                                                                     | `openscenario_interpreter`                                        | [#727](https://github.com/tier4/scenario_simulator_v2/pull/727) | [yamacir-kit](https://github.com/yamacir-kit) |
+| `Filter by range` option                      | Add `filter by range` option for detection sensor. If false, simulate detection result by lidar detection. If true, simulate detection result by range.                  | `traffic_simulator`                                               | [#729](https://github.com/tier4/scenario_simulator_v2/pull/729) | [hakuturu583](https://github.com/hakuturu583) |
+| Optimization of the trajectory calculation    | Hermite curve optimization, entities' trajectories calculated only when route changes                                                                                    | `traffic_simulator`, `behavior_tree_plugin`                       | [#708](https://github.com/tier4/scenario_simulator_v2/pull/708) | [danielm1405](https://github.com/danielm1405) |
+| OpenSCENARIO `Controller.Properties.Property` | Support new controller property `isClairvoyant`.                                                                                                                         | `openscenario_interpreter`                                        | [#735](https://github.com/tier4/scenario_simulator_v2/pull/735) | [yamacir-kit](https://github.com/yamacir-kit) |
+| Lane matching improvement for EgoEntity       | Subscribe route information from Autoware (topic : `/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id`) and try matching to on route lanelet. | `traffic_simulator`                                               | [#733](https://github.com/tier4/scenario_simulator_v2/pull/733) | [hakuturu583](https://github.com/hakuturu583) |
+| ZMQ client can connect through the network    | Add `"simulator_host"` argument to define the address of the simulator host that ZMQ tries to connect to                                                                 | `simulation_interface`, `traffic_simulator`, `random_test_runner` | [#690](https://github.com/tier4/scenario_simulator_v2/pull/690) | [danielm1405](https://github.com/danielm1405) |
+| Traffic signals                               | Support for multiple simultaneous lights at traffic signals and addition of color information to arrow signals.                                                          | `openscenario_interpreter`, `traffic_simulator`                   | [#740](https://github.com/tier4/scenario_simulator_v2/pull/740) | [yamacir-kit](https://github.com/yamacir-kit) |
+| Reset acceleration after speed was changed    | reset acceleration and deceleration only while speed change was enabled.                                                                                                 | `traffic_simulator`                                               | [#752](https://github.com/tier4/scenario_simulator_v2/pull/752) | [hakuturu583](https://github.com/hakuturu583) |
+| Traffic signals                               | Thereafter, a Lanelet ID that can be interpreted as either a relation ID or a way ID is treated as a relation ID.                                                        | `traffic_simulator`                                               | [#759](https://github.com/tier4/scenario_simulator_v2/pull/740) | [yamacir-kit](https://github.com/yamacir-kit) |
+| Optimization of the trajectory calculation    | Calculate a segment of trajectory spline instead of recalculating it from scratch                                                                                        | `traffic_simulator`, `behavior_tree_plugin`                       | [#710](https://github.com/tier4/scenario_simulator_v2/pull/710) | [danielm1405](https://github.com/danielm1405) |
+
+Bug Fixes:bug:
+
+| Feature                                | Brief summary                                                                       | Category                   | Pull request                                                    | Contributor                                   |
+| -------------------------------------- | ----------------------------------------------------------------------------------- | -------------------------- | --------------------------------------------------------------- | --------------------------------------------- |
+| OpenSCENARIO `Storyboard.Init.Actions` | Fix `Init.Actions.GlobalAction` and `Init.Actions.UserDefinedAction` to work.       | `openscenario_interpreter` | [#734](https://github.com/tier4/scenario_simulator_v2/pull/734) | [yamacir-kit](https://github.com/yamacir-kit) |
+| Fix waypoint height                    | Height of the NPC waypoint was 0. Get waypoint height from center point of lanelet. | `traffic_simulator`        | [#718](https://github.com/tier4/scenario_simulator_v2/pull/718) | [hakuturu583](https://github.com/hakuturu583) |
+| Fix calculateStopDistance function     | While calculating stop distance, deceleration was always 5.                         | `behavior_tree_plugin`     | [#747](https://github.com/tier4/scenario_simulator_v2/pull/747) | [hakuturu583](https://github.com/hakuturu583) |
+
+Minor Tweaks :oncoming_police_car:
+
+| Feature                   | Brief summary                                                                     | Category                   | Pull request                                                    | Contributor                                   |
+|---------------------------|-----------------------------------------------------------------------------------|----------------------------|-----------------------------------------------------------------|-----------------------------------------------|
+| OpenSCENARIO `Storyboard` | Update interpreter's main loop to not to stop even if `Storyboard` was completed. | `openscenario_interpreter` | [#720](https://github.com/tier4/scenario_simulator_v2/pull/720) | [yamacir-kit](https://github.com/yamacir-kit) |
+
+>>>>>>> 6e2154e0... feat: add dummy occgrid sensor
 ## Version 0.6.3
 - Speed up metrics manger class in order to reduce frame-rate dropping problem. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/680))
 - Fix problem in warping NPCs spawned in world coordinate. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/686))

@@ -135,7 +135,7 @@ public:
 
   auto getAcceleration() const -> double override;
 
-  auto getAutowareStateString() const -> std::string override;
+  auto getAutowareStateName() const -> std::string override;
 
   auto getGearSign() const -> double override;
 
@@ -165,4 +165,22 @@ public:
 };
 }  // namespace concealer
 
+<<<<<<< HEAD
+=======
+// for boost::lexical_cast
+namespace autoware_auto_system_msgs::msg
+{
+auto operator<<(std::ostream &, const EmergencyState &) -> std::ostream &;
+
+auto operator>>(std::istream &, EmergencyState &) -> std::istream &;
+}  // namespace autoware_auto_system_msgs::msg
+
+namespace autoware_auto_vehicle_msgs::msg
+{
+auto operator<<(std::ostream &, const TurnIndicatorsCommand &) -> std::ostream &;
+
+auto operator>>(std::istream &, TurnIndicatorsCommand &) -> std::istream &;
+}  // namespace autoware_auto_vehicle_msgs::msg
+
+>>>>>>> 6e2154e0... feat: add dummy occgrid sensor
 #endif  // CONCEALER__AUTOWARE_UNIVERSE_HPP_

@@ -149,6 +149,8 @@ public:
   bool attachDetectionSensor(const simulation_api_schema::DetectionSensorConfiguration &);
   bool attachDetectionSensor(const std::string &);
 
+  bool attachOccupancyGridSensor(const simulation_api_schema::OccupancyGridSensorConfiguration &);
+
   bool initialize(double realtime_factor, double step_time);
 
   bool updateFrame();
@@ -190,13 +192,24 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getCurrentAction);
   FORWARD_TO_ENTITY_MANAGER(getDriverModel);
   FORWARD_TO_ENTITY_MANAGER(getEgoName);
+<<<<<<< HEAD
+=======
+  FORWARD_TO_ENTITY_MANAGER(getEmergencyStateName);
+>>>>>>> 6e2154e0... feat: add dummy occgrid sensor
   FORWARD_TO_ENTITY_MANAGER(getEntityNames);
   FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
   FORWARD_TO_ENTITY_MANAGER(getLongitudinalDistance);
   FORWARD_TO_ENTITY_MANAGER(getRelativePose);
   FORWARD_TO_ENTITY_MANAGER(getStandStillDuration);
+<<<<<<< HEAD
   FORWARD_TO_ENTITY_MANAGER(getTrafficLightArrow);
   FORWARD_TO_ENTITY_MANAGER(getTrafficLightColor);
+=======
+  FORWARD_TO_ENTITY_MANAGER(getTrafficLight);
+  FORWARD_TO_ENTITY_MANAGER(getTrafficLights);
+  FORWARD_TO_ENTITY_MANAGER(getTrafficRelationReferees);
+  FORWARD_TO_ENTITY_MANAGER(getTurnIndicatorsCommandName);
+>>>>>>> 6e2154e0... feat: add dummy occgrid sensor
   FORWARD_TO_ENTITY_MANAGER(getVehicleCommand);
   FORWARD_TO_ENTITY_MANAGER(isInLanelet);
   FORWARD_TO_ENTITY_MANAGER(ready);
