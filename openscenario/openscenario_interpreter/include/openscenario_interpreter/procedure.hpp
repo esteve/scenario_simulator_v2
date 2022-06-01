@@ -100,6 +100,7 @@ STRIP_OPTIONAL(getTimeHeadway, std::numeric_limits<value_type>::quiet_NaN());
 
 FORWARD_TO_SIMULATION_API(attachDetectionSensor);
 FORWARD_TO_SIMULATION_API(attachLidarSensor);
+FORWARD_TO_SIMULATION_API(attachOccupancyGridSensor);
 FORWARD_TO_SIMULATION_API(engage);
 FORWARD_TO_SIMULATION_API(getCurrentAction);
 FORWARD_TO_SIMULATION_API(getCurrentTime);
@@ -134,6 +135,11 @@ RENAME(applyLaneChangeAction, requestLaneChange);
 RENAME(applyTeleportAction, setEntityStatus);
 RENAME(applyWalkStraightAction, requestWalkStraight);
 RENAME(evaluateCollisionCondition, checkCollision);
+<<<<<<< HEAD
+=======
+RENAME(evaluateCurrentEmergencyState, getEmergencyStateName);
+RENAME(evaluateCurrentTurnIndicatorsState, getTurnIndicatorsCommandName);
+>>>>>>> 6e2154e0... feat: add dummy occgrid sensor
 RENAME(evaluateCurrentState, getCurrentAction);
 RENAME(evaluateReachPositionCondition, reachPosition);
 RENAME(getTrafficSignalArrow, getTrafficLightArrow);
