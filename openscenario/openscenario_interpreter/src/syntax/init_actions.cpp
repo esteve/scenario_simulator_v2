@@ -41,6 +41,49 @@ InitActions::InitActions(const pugi::xml_node & node, Scope & scope)
   }
 }
 
+auto InitActions::evaluate() const -> Object
+{
+  for (auto e : *this) {
+    if (e.is<GlobalAction>()) {
+      apply<void>(
+        [](auto && action) {
+          if (action.endsImmediately() or getCurrentTime() > 0) {
+            action.start();
+            action.run();
+          } else {
+            RCLCPP_INFO(
+              rclcpp::get_logger("InitActions"),
+              "skip a global action because it's non instantaneous action");
+          }
+        },
+        e.as<GlobalAction>());
+    } else if (e.is<UserDefinedAction>()) {
+      if (UserDefinedAction::endsImmediately()) {
+        e.as<UserDefinedAction>().evaluate();
+      } else {
+        RCLCPP_INFO(
+          rclcpp::get_logger("InitActions"),
+          "skip a user defined action because it's non instantaneous action");
+      }
+    } else if (e.is<Private>()) {
+      for (auto private_action : e.as<Private>().private_actions) {
+        apply<void>(
+          [](auto && action) {
+            if (action.endsImmediately()) {
+              action.start();
+              action.run();
+            } else {
+              RCLCPP_INFO(
+                rclcpp::get_logger("InitActions"),
+                "skip a private action because it's non instantaneous action");
+            }
+          },
+          private_action);
+      }
+    }
+  }
+}
+
 auto InitActions::evaluateInstantly() const -> Object
 {
   for (auto e : *this) {

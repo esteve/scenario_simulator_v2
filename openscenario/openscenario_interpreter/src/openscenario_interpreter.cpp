@@ -129,7 +129,7 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
 
 auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 {
-  auto initializeStoryboardInstantly = [this]() {
+  auto initializeStoryboard = [this]() {
     return withExceptionHandler(
       [this](auto &&...) {
         publishCurrentContext();
@@ -137,25 +137,8 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
       },
       [this]() {
         if (currentScenarioDefinition()) {
-          currentScenarioDefinition()->storyboard.init.evaluateInstantly();
+          currentScenarioDefinition()->storyboard.init.evaluate();
           updateFrame();
-        } else {
-          throw Error("No script evaluable.");
-        }
-      });
-  };
-
-  auto initializeStoryboardNonInstantly = [this]() {
-    return withExceptionHandler(
-      [this](auto &&...) {
-        publishCurrentContext();
-        deactivate();
-      },
-      [this]() {
-        if (currentScenarioDefinition()) {
-          while (!currentScenarioDefinition()->storyboard.init.evaluateNonInstantly()) {
-            updateFrame();
-          }
         } else {
           throw Error("No script evaluable.");
         }
@@ -217,8 +200,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 
         assert(publisher_of_context->is_activated());
 
-        initializeStoryboardInstantly();
-        initializeStoryboardNonInstantly();
+        initializeStoryboard();
         timer = create_wall_timer(currentLocalFrameRate(), evaluateStoryboard);
 
         return Interpreter::Result::SUCCESS;  // => Active
