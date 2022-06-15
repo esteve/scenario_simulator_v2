@@ -41,8 +41,13 @@ Storyboard::Storyboard(const pugi::xml_node & node, Scope & scope)
 
 auto Storyboard::run() -> void
 {
-  for (auto && story : elements) {
-    story.evaluate();
+  if (not init.actions.accomplished()) {
+    init.evaluate();
+  } else {
+    std::cout << "Main Story" << std::endl;
+    for (auto && story : elements) {
+      story.evaluate();
+    }
   }
 }
 

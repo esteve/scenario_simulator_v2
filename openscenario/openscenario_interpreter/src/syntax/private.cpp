@@ -31,6 +31,13 @@ Private::Private(const pugi::xml_node & node, Scope & scope)
   });
 }
 
+auto Private::accomplished() const -> bool
+{
+  return std::all_of(
+    private_actions.begin(), private_actions.end(),
+    [](const PrivateAction & private_action) { return private_action.accomplished(); });
+}
+
 auto Private::endsImmediately() const -> bool
 {
   return std::all_of(

@@ -42,6 +42,8 @@ struct Private : public Scope
 
   explicit Private(const pugi::xml_node &, Scope &);
 
+  auto accomplished() const -> bool;
+
   auto endsImmediately() const -> bool;
 
   auto evaluate() -> Object;

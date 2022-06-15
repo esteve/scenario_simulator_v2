@@ -38,6 +38,8 @@ struct InitActions : public Elements
 {
   explicit InitActions(const pugi::xml_node &, Scope &);
 
+  auto accomplished() const -> bool;
+
   auto endsImmediately() const -> bool;
 
   auto evaluateInstantly() const -> Object;
