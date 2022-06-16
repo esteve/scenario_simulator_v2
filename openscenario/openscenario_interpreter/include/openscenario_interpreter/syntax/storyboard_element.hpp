@@ -203,7 +203,7 @@ public:
         *  Story element instantaneously transitions into the runningState.
         *
         * ------------------------------------------------------------------- */
-        if (start_trigger.evaluate().as<Boolean>()) {
+        if (start_trigger.evaluate().as<Boolean>() and (true or getCurrentTime() > 0)) {
           transitionTo(start_transition);
           goto dispatch;
         } else {

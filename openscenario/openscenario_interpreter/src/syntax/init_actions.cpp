@@ -41,15 +41,26 @@ InitActions::InitActions(const pugi::xml_node & node, Scope & scope)
   }
 }
 
+//auto InitActions::accomplished() const -> bool {
+//  return false;
+//}
+
 auto InitActions::evaluate() const -> Object
 {
+  static int after_engage_count = 0;
+  if (getCurrentTime() > 0) {
+    after_engage_count++;
+  }
   for (auto e : *this) {
     if (e.is<GlobalAction>()) {
       apply<void>(
-        [](auto && action) {
+        [=](auto && action) {
           if (action.endsImmediately() or getCurrentTime() > 0) {
-            action.start();
-            action.run();
+            if (after_engage_count == 1) {
+              action.start();
+            } else {
+              action.run();
+            }
           } else {
             RCLCPP_INFO(
               rclcpp::get_logger("InitActions"),
@@ -58,7 +69,7 @@ auto InitActions::evaluate() const -> Object
         },
         e.as<GlobalAction>());
     } else if (e.is<UserDefinedAction>()) {
-      if (UserDefinedAction::endsImmediately()) {
+      if (UserDefinedAction::endsImmediately() or getCurrentTime() > 0) {
         e.as<UserDefinedAction>().evaluate();
       } else {
         RCLCPP_INFO(
@@ -69,9 +80,21 @@ auto InitActions::evaluate() const -> Object
       for (auto private_action : e.as<Private>().private_actions) {
         apply<void>(
           [](auto && action) {
-            if (action.endsImmediately()) {
-              action.start();
-              action.run();
+            if (action.endsImmediately() or getCurrentTime() > 0) {
+              if (after_engage_count == 1) {
+                std::cout
+                  << "START!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                  << std::endl;
+                action.start();
+                std::cout << "started" << std::endl;
+              } else {
+                std::cout << "RUN!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                          << std::endl;
+                action.run();
+                std::cout << "ran" << std::endl;
+              }
+              //              action.evaluate();
+
             } else {
               RCLCPP_INFO(
                 rclcpp::get_logger("InitActions"),

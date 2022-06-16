@@ -29,6 +29,8 @@ Storyboard::Storyboard(const pugi::xml_node & node, Scope & scope)
   StoryboardElement(readElement<Trigger>("StopTrigger", node, local())),
   init(readElement<Init>("Init", node, local()))
 {
+  elements.push_back(make(init));
+
   traverse<1, unbounded>(node, "Story", [&](auto && node) {
     return elements.push_back(readStoryboardElement<Story>(node, local()));
   });
@@ -41,13 +43,11 @@ Storyboard::Storyboard(const pugi::xml_node & node, Scope & scope)
 
 auto Storyboard::run() -> void
 {
-  if (not init.actions.accomplished()) {
-    init.evaluate();
-  } else {
-    std::cout << "Main Story" << std::endl;
-    for (auto && story : elements) {
-      story.evaluate();
-    }
+  //  init.evaluate();
+  //  std::cout << "Init Actions" << std::endl;
+  //  std::cout << "Main Story" << std::endl;
+  for (auto && story : elements) {
+    story.evaluate();
   }
 }
 
