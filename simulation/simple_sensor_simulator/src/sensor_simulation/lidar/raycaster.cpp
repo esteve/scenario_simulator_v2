@@ -111,11 +111,11 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
   for (const auto & id : detected_ids) {
     detected_objects_.emplace_back(geometry_ids_[id]);
   }
-  sensor_msgs::msg::PointCloud2 pointcloud_msg;
-  pcl::toROSMsg(*cloud, pointcloud_msg);
+  auto output = std::make_shared<PointCloud2>();
+  pcl::toROSMsg(*cloud, *output);
   rtcReleaseScene(scene_);
-  pointcloud_msg.header.frame_id = frame_id;
-  pointcloud_msg.header.stamp = stamp;
-  return pointcloud_msg;
+  output->header.frame_id = frame_id;
+  output->header.stamp = stamp;
+  return output;
 }
 }  // namespace simple_sensor_simulator
